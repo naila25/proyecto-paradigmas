@@ -1,21 +1,54 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
-  <title>Ruleta de Categorías</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruleta de Categorías - Trivia Universitaria</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-br from-indigo-700 via-purple-600 to-pink-500 flex flex-col items-center justify-center min-h-screen text-white">
 
-  <h1 class="text-4xl font-bold mb-6">🎡 Gira la ruleta para elegir una categoría</h1>
+<body class="bg-gradient-to-br from-indigo-700 via-purple-600 to-pink-500 min-h-screen text-white">
 
-  <div class="relative flex justify-center items-center">
-    <canvas id="ruleta" width="400" height="400" class="rounded-full shadow-2xl"></canvas>
-    <button id="botonGirar" class="absolute bg-yellow-400 text-black px-8 py-3 rounded-full font-bold hover:bg-yellow-300 transition">GIRAR</button>
+  <div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">🎡 Ruleta de Trivia</h1>
+      <p class="text-lg opacity-90">¡Gira la ruleta para elegir una categoría y demuestra tus conocimientos!</p>
+    </div>
+
+    <!-- Ruleta Container -->
+    <div class="flex flex-col items-center mb-8">
+      <div class="relative mb-6">
+        <canvas id="ruleta" width="400" height="400" class="rounded-full shadow-2xl border-4 border-white/20"></canvas>
+        <button id="botonGirar"
+          class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-yellow-400 text-black px-8 py-3 rounded-full font-bold hover:bg-yellow-300 transition-all duration-200 hover:scale-105 shadow-lg">
+          GIRAR
+        </button>
+      </div>
+
+      <!-- Instrucciones -->
+      <div class="text-center bg-white/10 backdrop-blur-md rounded-lg p-4 mb-6">
+        <p class="text-sm">🎯 <strong>Instrucciones:</strong> Haz clic en "GIRAR" para seleccionar una categoría
+          aleatoriamente</p>
+      </div>
+    </div>
+
+    <!-- Área de preguntas -->
+    <div id="pregunta"
+      class="max-w-2xl mx-auto text-center text-lg bg-white/20 backdrop-blur-md rounded-xl p-6 shadow-xl min-h-[200px] flex items-center justify-center">
+      <p class="text-xl"> ¡Gira la ruleta para comenzar!</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center mt-8">
+      <a href="/" class="inline-block bg-white/20 hover:bg-white/30 transition px-4 py-2 rounded-lg">
+         Volver al inicio
+      </a>
+    </div>
   </div>
-
-  <div id="pregunta" class="mt-10 text-center text-xl bg-white/20 backdrop-blur-md rounded-xl p-6 w-[80%] md:w-[50%] shadow-lg"></div>
 
   <script src="{{ url_for('static', filename='js/ruleta.js') }}"></script>
 </body>
+
 </html>
