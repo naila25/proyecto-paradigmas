@@ -51,4 +51,4 @@ respuesta_correcta(Pregunta, RespuestaUsuario) :-
     pregunta(_, Pregunta, RespuestaCorrecta),
     normalizar_texto(RespuestaUsuario, RU),
     normalizar_texto(RespuestaCorrecta, RC),
-    RU = RC.
+    RU = RC.    

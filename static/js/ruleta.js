@@ -89,10 +89,10 @@ async function cargarPregunta(categoria) {
     console.log('Datos recibidos:', data);
 
     const categoriaEmojis = {
-      'historia': '🏛️',
-      'ciencia': '🔬',
-      'arte': '🎨',
-      'deportes': '⚽'
+      'historia': '',
+      'ciencia': '',
+      'arte': '',
+      'deportes': ''
     };
 
     if (!data.pregunta || !data.respuesta) {
@@ -120,7 +120,7 @@ async function cargarPregunta(categoria) {
     console.error('Error cargando pregunta:', error);
     document.getElementById("pregunta").innerHTML = `
       <div class="text-center">
-        <p class="text-red-300 mb-4">❌ Error cargando la pregunta</p>
+        <p class="text-red-300 mb-4"> Error cargando la pregunta</p>
         <p class="text-sm">Error: ${error.message}</p>
         <button onclick="nuevaPregunta()" class="mt-4 bg-blue-500 px-4 py-2 rounded hover:bg-blue-400">Intentar de nuevo</button>
       </div>
@@ -132,7 +132,7 @@ async function verificar(pregunta, correcta) {
   const resp = document.getElementById("resp").value.trim();
 
   if (!resp) {
-    alert("⚠️ Por favor, escribe una respuesta antes de enviar.");
+    alert(" Por favor, escribe una respuesta antes de enviar.");
     return;
   }
 

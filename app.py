@@ -17,13 +17,13 @@ app.config['JSON_AS_ASCII'] = False  # Importante para UTF-8 en JSON
 # Configurar logging
 logging.basicConfig(level=logging.DEBUG, encoding='utf-8')
 
-# Inicializar Prolog
+# Inicializar el Prolog
 try:
     prolog = Prolog()
     prolog.consult("preguntas.pl")
     print("✅ Prolog inicializado correctamente")
 except Exception as e:
-    print(f"❌ Error inicializando Prolog: {e}")
+    print(f"Error inicializando Prolog: {e}")
     prolog = None
 
 def limpiar_string(valor):
@@ -58,7 +58,7 @@ def juego():
 @app.route('/pregunta/<categoria>')
 def obtener_pregunta(categoria):
     try:
-        print(f"🔍 Solicitando pregunta para categoría: {categoria}")
+        print(f" Solicitando pregunta para categoría: {categoria}")
         
         if prolog is None:
             return jsonify({"error": "Prolog no está disponible"}), 500
@@ -69,7 +69,7 @@ def obtener_pregunta(categoria):
             
         # Consultar preguntas en Prolog
         query = f"pregunta({categoria}, Pregunta, Respuesta)"
-        print(f"🔎 Query: {query}")
+        print(f" Query: {query}")
         
         preguntas = list(prolog.query(query))
         
