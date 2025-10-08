@@ -17,7 +17,6 @@ function dibujarRuleta() {
   for (let i = 0; i < categorias.length; i++) {
     const angulo = (2 * Math.PI) / categorias.length;
 
-    // Dibujar sector
     ctx.beginPath();
     ctx.moveTo(tam, tam);
     ctx.arc(tam, tam, tam - 10, anguloInicio, anguloInicio + angulo);
@@ -27,7 +26,6 @@ function dibujarRuleta() {
     ctx.lineWidth = 3;
     ctx.stroke();
 
-    // Dibujar texto
     ctx.save();
     ctx.translate(tam, tam);
     ctx.rotate(anguloInicio + angulo / 2);
@@ -89,38 +87,40 @@ async function cargarPregunta(categoria) {
     console.log('Datos recibidos:', data);
 
     const categoriaEmojis = {
-      'historia': '',
-      'ciencia': '',
-      'arte': '',
-      'deportes': ''
+      'historia': '🏛️',
+      'ciencia': '🔬',
+      'arte': '🎨',
+      'deportes': '⚽'
     };
 
-    if (!data.pregunta || !data.respuesta) {
+    if (!data.pregunta || !data.opciones || !data.respuesta) {
       throw new Error('Datos de pregunta incompletos');
     }
+
+    // Crear botones para cada opción
+    const opcionesHTML = data.opciones.map(opcion => 
+      `<button onclick="verificar('${data.pregunta.replace(/'/g, "\\'")}', '${opcion.replace(/'/g, "\\'")}', '${data.respuesta.replace(/'/g, "\\'")}'); return false;" 
+              class="bg-white text-purple-700 px-6 py-3 rounded-lg hover:bg-purple-100 transition font-semibold w-full sm:w-auto min-w-[200px] shadow-md hover:shadow-lg transform hover:scale-105">
+         ${opcion}
+       </button>`
+    ).join('');
 
     document.getElementById("pregunta").innerHTML = `
       <div class="text-center">
         <p class="mb-4 text-2xl font-semibold">${categoriaEmojis[categoria]} Categoría: <span class="capitalize text-yellow-300">${categoria}</span></p>
-        <p class="mb-6 text-lg font-medium">${data.pregunta}</p>
-        <div class="flex flex-col sm:flex-row gap-2 items-center justify-center">
-          <input id="resp" class="p-3 text-black rounded-lg flex-1 max-w-md" placeholder="Escribe tu respuesta aquí..." onkeypress="if(event.key==='Enter') verificar('${data.pregunta.replace(/'/g, "\\'")}','${data.respuesta.replace(/'/g, "\\'")}')">
-          <button onclick="verificar('${data.pregunta.replace(/'/g, "\\'")}','${data.respuesta.replace(/'/g, "\\'")}'); return false;" class="bg-green-500 px-6 py-3 rounded-lg hover:bg-green-400 transition font-bold">📤 Enviar</button>
+        <p class="mb-6 text-xl font-medium">${data.pregunta}</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl mx-auto">
+          ${opcionesHTML}
         </div>
-        <p class="mt-4 text-sm opacity-75">Puntos actuales: ${puntosTotales}</p>
+        <p class="mt-6 text-sm opacity-75">Puntos actuales: ${puntosTotales}</p>
       </div>
     `;
-
-    setTimeout(() => {
-      const input = document.getElementById("resp");
-      if (input) input.focus();
-    }, 100);
 
   } catch (error) {
     console.error('Error cargando pregunta:', error);
     document.getElementById("pregunta").innerHTML = `
       <div class="text-center">
-        <p class="text-red-300 mb-4"> Error cargando la pregunta</p>
+        <p class="text-red-300 mb-4">❌ Error cargando la pregunta</p>
         <p class="text-sm">Error: ${error.message}</p>
         <button onclick="nuevaPregunta()" class="mt-4 bg-blue-500 px-4 py-2 rounded hover:bg-blue-400">Intentar de nuevo</button>
       </div>
@@ -128,19 +128,12 @@ async function cargarPregunta(categoria) {
   }
 }
 
-async function verificar(pregunta, correcta) {
-  const resp = document.getElementById("resp").value.trim();
-
-  if (!resp) {
-    alert(" Por favor, escribe una respuesta antes de enviar.");
-    return;
-  }
-
+async function verificar(pregunta, respuestaSeleccionada, respuestaCorrecta) {
   try {
     const res = await fetch('/verificar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pregunta, respuesta: resp })
+      body: JSON.stringify({ pregunta, respuesta: respuestaSeleccionada })
     });
     const data = await res.json();
 
@@ -149,21 +142,27 @@ async function verificar(pregunta, correcta) {
     if (data.correcta) {
       document.getElementById("pregunta").innerHTML = `
         <div class="text-center">
-          <h2 class="text-3xl mb-4">✅ ¡Correcto!</h2>
+          <h2 class="text-4xl mb-4">✅ ¡Correcto!</h2>
+          <p class="text-2xl mb-2 text-green-300">Tu respuesta: <strong>${respuestaSeleccionada}</strong></p>
           <p class="text-xl mb-4">+10 puntos</p>
-          <p class="mb-6">Puntos totales: <span class="text-yellow-300 font-bold">${puntosTotales}</span></p>
-          <button onclick="nuevaPregunta()" class="bg-blue-500 px-6 py-3 rounded-lg hover:bg-blue-400 transition">🎯 Nueva pregunta</button>
-          <button onclick="terminarJuego()" class="ml-2 bg-red-500 px-6 py-3 rounded-lg hover:bg-red-400 transition">🏁 Terminar juego</button>
+          <p class="mb-6 text-2xl">Puntos totales: <span class="text-yellow-300 font-bold">${puntosTotales}</span></p>
+          <div class="flex gap-3 justify-center flex-wrap">
+            <button onclick="nuevaPregunta()" class="bg-blue-500 px-6 py-3 rounded-lg hover:bg-blue-400 transition font-bold">🎯 Nueva pregunta</button>
+            <button onclick="terminarJuego()" class="bg-red-500 px-6 py-3 rounded-lg hover:bg-red-400 transition font-bold">🏁 Terminar juego</button>
+          </div>
         </div>
       `;
     } else {
       document.getElementById("pregunta").innerHTML = `
         <div class="text-center">
-          <h2 class="text-3xl mb-4">❌ Incorrecto</h2>
-          <p class="text-lg mb-4">La respuesta correcta era: <span class="text-yellow-300 font-bold">${correcta}</span></p>
-          <p class="mb-6">Puntos totales: <span class="text-yellow-300 font-bold">${puntosTotales}</span></p>
-          <button onclick="nuevaPregunta()" class="bg-blue-500 px-6 py-3 rounded-lg hover:bg-blue-400 transition">🎯 Nueva pregunta</button>
-          <button onclick="terminarJuego()" class="ml-2 bg-red-500 px-6 py-3 rounded-lg hover:bg-red-400 transition">🏁 Terminar juego</button>
+          <h2 class="text-4xl mb-4">❌ Incorrecto</h2>
+          <p class="text-xl mb-2 text-red-300">Tu respuesta: <strong>${respuestaSeleccionada}</strong></p>
+          <p class="text-xl mb-4">La respuesta correcta era: <span class="text-yellow-300 font-bold">${respuestaCorrecta}</span></p>
+          <p class="mb-6 text-2xl">Puntos totales: <span class="text-yellow-300 font-bold">${puntosTotales}</span></p>
+          <div class="flex gap-3 justify-center flex-wrap">
+            <button onclick="nuevaPregunta()" class="bg-blue-500 px-6 py-3 rounded-lg hover:bg-blue-400 transition font-bold">🎯 Nueva pregunta</button>
+            <button onclick="terminarJuego()" class="bg-red-500 px-6 py-3 rounded-lg hover:bg-red-400 transition font-bold">🏁 Terminar juego</button>
+          </div>
         </div>
       `;
     }
