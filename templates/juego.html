@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ruleta de Categorías - Trivia Universitaria</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-
 <body class="bg-gradient-to-br from-indigo-700 via-purple-600 to-pink-500 min-h-screen text-white">
 
   <div class="container mx-auto px-4 py-8">
     <!-- Header -->
-    <div class="text-center mb-8">
-      <h1 class="text-4xl md:text-5xl font-bold mb-4">🎡 Ruleta de Trivia</h1>
-      <p class="text-lg opacity-90">¡Gira la ruleta para elegir una categoría y demuestra tus conocimientos!</p>
+    <div class="text-center mb-4">
+      <h1 class="text-4xl md:text-5xl font-bold mb-2">🎡 Ruleta de Trivia</h1>
+      
+      <!-- Info de jugadores -->
+      <div id="info-jugadores" class="mt-4"></div>
     </div>
 
     <!-- Ruleta Container -->
@@ -29,26 +29,32 @@
 
       <!-- Instrucciones -->
       <div class="text-center bg-white/10 backdrop-blur-md rounded-lg p-4 mb-6">
-        <p class="text-sm">🎯 <strong>Instrucciones:</strong> Haz clic en "GIRAR" para seleccionar una categoría
-          aleatoriamente</p>
+        <p class="text-sm">🎯 <strong>Instrucciones:</strong> Haz clic en "GIRAR" para seleccionar una categoría</p>
+        {% if num_jugadores == 2 %}
+        <p class="text-xs mt-2 text-yellow-300">⚠️ Si fallas 3 veces, pierdes automáticamente</p>
+        {% endif %}
       </div>
     </div>
 
     <!-- Área de preguntas -->
     <div id="pregunta"
       class="max-w-2xl mx-auto text-center text-lg bg-white/20 backdrop-blur-md rounded-xl p-6 shadow-xl min-h-[200px] flex items-center justify-center">
-      <p class="text-xl"> ¡Gira la ruleta para comenzar!</p>
+      <p class="text-xl">🎡 ¡Gira la ruleta para comenzar!</p>
     </div>
 
     <!-- Footer -->
     <div class="text-center mt-8">
       <a href="/" class="inline-block bg-white/20 hover:bg-white/30 transition px-4 py-2 rounded-lg">
-         Volver al inicio
+        🏠 Volver al inicio
       </a>
     </div>
   </div>
 
+
+ <script>
+    const NUM_JUGADORES = parseInt('{{ num_jugadores|default(1) }}') || 1;
+  </script>
+
   <script src="{{ url_for('static', filename='js/ruleta.js') }}"></script>
 </body>
-
 </html>

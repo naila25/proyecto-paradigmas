@@ -20,55 +20,49 @@ try:
     prolog = Prolog()
     prolog.consult("preguntas.pl")
     print("✅ Prolog inicializado correctamente")
-    
-    # Test de consulta
-    test = list(prolog.query("pregunta(ciencia, P, O, R)"))
-    print(f"✅ Test: {len(test)} preguntas de ciencia encontradas")
-    
 except Exception as e:
     print(f"❌ Error inicializando Prolog: {e}")
-    import traceback
-    traceback.print_exc()
     prolog = None
 
 def limpiar_string(valor):
-    """Limpia y normaliza strings de Prolog"""
     if valor is None:
         return ""
-    
     texto = str(valor)
-    
     if 'Ã' in texto or 'Â' in texto:
         try:
             texto = texto.encode('latin-1').decode('utf-8')
         except:
             pass
-    
     return texto.strip()
 
 def convertir_lista_prolog(lista_prolog):
-    """Convierte lista de Prolog a lista de Python"""
     if isinstance(lista_prolog, list):
         return [limpiar_string(item) for item in lista_prolog]
     return []
 
 @app.route('/')
 def index():
-    session['puntos'] = 0
+    session.clear()
     return render_template("index.html")
 
 @app.route('/juego')
 def juego():
-    if 'puntos' not in session:
-        session['puntos'] = 0
-    return render_template("juego.html")
+    num_jugadores = request.args.get('jugadores', '1')
+    
+    # Inicializar juego
+    session['num_jugadores'] = int(num_jugadores)
+    session['turno_actual'] = 1
+    session['jugador1_puntos'] = 0
+    session['jugador2_puntos'] = 0
+    session['jugador1_vidas'] = 3
+    session['jugador2_vidas'] = 3
+    session['juego_terminado'] = False
+    
+    return render_template("juego.html", num_jugadores=int(num_jugadores))
 
 @app.route('/pregunta/<categoria>')
 def obtener_pregunta(categoria):
     try:
-        print(f"\n{'='*60}")
-        print(f"🔍 Solicitando pregunta para categoría: {categoria}")
-        
         if prolog is None:
             return jsonify({"error": "Prolog no está disponible"}), 500
         
@@ -77,10 +71,7 @@ def obtener_pregunta(categoria):
             return jsonify({"error": "Categoría no válida"}), 400
             
         query = f"pregunta({categoria}, Pregunta, Opciones, Respuesta)"
-        print(f"🔎 Query: {query}")
-        
         preguntas = list(prolog.query(query))
-        print(f"📝 Preguntas encontradas: {len(preguntas)}")
         
         if not preguntas:
             return jsonify({"error": "No hay preguntas para esta categoría"}), 404
@@ -90,13 +81,6 @@ def obtener_pregunta(categoria):
         pregunta_str = limpiar_string(seleccion["Pregunta"])
         respuesta_str = limpiar_string(seleccion["Respuesta"])
         opciones_list = convertir_lista_prolog(seleccion["Opciones"])
-        
-        print(f"✅ Pregunta: '{pregunta_str}'")
-        print(f"✅ Opciones: {opciones_list}")
-        print(f"✅ Respuesta correcta: '{respuesta_str}'")
-        print(f"   Tipo respuesta: {type(respuesta_str)}")
-        print(f"   Bytes respuesta: {respuesta_str.encode('utf-8')}")
-        print(f"{'='*60}\n")
         
         return jsonify({
             "pregunta": pregunta_str,
@@ -118,62 +102,75 @@ def verificar():
         pregunta = data["pregunta"]
         respuesta = data["respuesta"]
         
-        print(f"\n{'='*60}")
-        print(f"🔍 VERIFICANDO RESPUESTA")
-        print(f"{'='*60}")
-        print(f"📝 Pregunta recibida:")
-        print(f"   Texto: '{pregunta}'")
-        print(f"   Tipo: {type(pregunta)}")
-        print(f"   Bytes: {pregunta.encode('utf-8')}")
-        print(f"\n👤 Respuesta del usuario:")
-        print(f"   Texto: '{respuesta}'")
-        print(f"   Tipo: {type(respuesta)}")
-        print(f"   Longitud: {len(respuesta)}")
-        print(f"   Bytes: {respuesta.encode('utf-8')}")
-        print(f"   Repr: {repr(respuesta)}")
-        
         if prolog is None:
             return jsonify({"error": "Prolog no está disponible"}), 500
         
-        # Obtener la respuesta correcta desde Prolog
-        pregunta_escaped_buscar = pregunta.replace("'", "''")
-        query_buscar = f"pregunta(_, '{pregunta_escaped_buscar}', _, RC)"
-        print(f"\n🔎 Buscando respuesta correcta en Prolog:")
-        print(f"   Query: {query_buscar}")
-        
-        resultados_busqueda = list(prolog.query(query_buscar))
-        if resultados_busqueda:
-            respuesta_correcta_prolog = limpiar_string(resultados_busqueda[0]["RC"])
-            print(f"   Respuesta correcta en Prolog: '{respuesta_correcta_prolog}'")
-            print(f"   Bytes: {respuesta_correcta_prolog.encode('utf-8')}")
-        else:
-            print(f"   ⚠️ No se encontró la pregunta en Prolog")
-        
-        # Limpiar espacios
-        respuesta_limpia = respuesta.strip()
-        
         pregunta_escaped = pregunta.replace("'", "''")
-        respuesta_escaped = respuesta_limpia.replace("'", "''")
+        respuesta_escaped = respuesta.replace("'", "''")
         
         query = f"respuesta_correcta('{pregunta_escaped}', '{respuesta_escaped}')"
-        print(f"\n🔎 Verificando con Prolog:")
-        print(f"   Query: {query}")
-        
         resultado = list(prolog.query(query))
-        print(f"\n📋 Resultado de Prolog:")
-        print(f"   Raw: {resultado}")
-        print(f"   Cantidad: {len(resultado)}")
-        print(f"   ✅ Es correcta: {len(resultado) > 0}")
-        print(f"{'='*60}\n")
         
-        if 'puntos' not in session:
-            session['puntos'] = 0
+        num_jugadores = session.get('num_jugadores', 1)
+        turno_actual = session.get('turno_actual', 1)
+        
+        es_correcta = len(resultado) > 0
+        
+        if num_jugadores == 1:
+            # Modo 1 jugador
+            if 'jugador1_puntos' not in session:
+                session['jugador1_puntos'] = 0
             
-        if resultado:
-            session['puntos'] += 10
-            return jsonify({"correcta": True, "puntos": session['puntos']})
+            if es_correcta:
+                session['jugador1_puntos'] += 10
+            
+            return jsonify({
+                "correcta": es_correcta,
+                "puntos": session['jugador1_puntos'],
+                "modo": "individual"
+            })
+        
         else:
-            return jsonify({"correcta": False, "puntos": session['puntos']})
+            # Modo 2 jugadores
+            if es_correcta:
+                if turno_actual == 1:
+                    session['jugador1_puntos'] += 10
+                else:
+                    session['jugador2_puntos'] += 10
+            else:
+                # Quitar una vida si es incorrecta
+                if turno_actual == 1:
+                    session['jugador1_vidas'] -= 1
+                else:
+                    session['jugador2_vidas'] -= 1
+            
+            # Verificar si alguien perdió todas sus vidas
+            jugador1_vidas = session.get('jugador1_vidas', 3)
+            jugador2_vidas = session.get('jugador2_vidas', 3)
+            
+            ganador = None
+            if jugador1_vidas <= 0:
+                ganador = 2
+                session['juego_terminado'] = True
+            elif jugador2_vidas <= 0:
+                ganador = 1
+                session['juego_terminado'] = True
+            
+            # Cambiar turno si la respuesta fue incorrecta o si el juego no terminó
+            if not es_correcta and not session.get('juego_terminado', False):
+                session['turno_actual'] = 2 if turno_actual == 1 else 1
+            
+            return jsonify({
+                "correcta": es_correcta,
+                "modo": "multijugador",
+                "turno_actual": session.get('turno_actual', 1),
+                "jugador1_puntos": session.get('jugador1_puntos', 0),
+                "jugador2_puntos": session.get('jugador2_puntos', 0),
+                "jugador1_vidas": session.get('jugador1_vidas', 3),
+                "jugador2_vidas": session.get('jugador2_vidas', 3),
+                "juego_terminado": session.get('juego_terminado', False),
+                "ganador": ganador
+            })
             
     except Exception as e:
         print(f"💥 Error: {str(e)}")
@@ -181,14 +178,53 @@ def verificar():
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
-@app.route('/puntos')
-def obtener_puntos():
-    return jsonify({"puntos": session.get('puntos', 0)})
+@app.route('/estado-juego')
+def estado_juego():
+    """Retorna el estado actual del juego"""
+    return jsonify({
+        "num_jugadores": session.get('num_jugadores', 1),
+        "turno_actual": session.get('turno_actual', 1),
+        "jugador1_puntos": session.get('jugador1_puntos', 0),
+        "jugador2_puntos": session.get('jugador2_puntos', 0),
+        "jugador1_vidas": session.get('jugador1_vidas', 3),
+        "jugador2_vidas": session.get('jugador2_vidas', 3),
+        "juego_terminado": session.get('juego_terminado', False)
+    })
 
 @app.route('/resultado')
 def resultado():
-    puntos_finales = session.get('puntos', 0)
-    return render_template("resultado.html", puntos=puntos_finales)
+    num_jugadores = session.get('num_jugadores', 1)
+    
+    if num_jugadores == 1:
+        puntos = session.get('jugador1_puntos', 0)
+        return render_template("resultado.html", 
+                             modo="individual",
+                             puntos=puntos)
+    else:
+        jugador1_puntos = session.get('jugador1_puntos', 0)
+        jugador2_puntos = session.get('jugador2_puntos', 0)
+        jugador1_vidas = session.get('jugador1_vidas', 3)
+        jugador2_vidas = session.get('jugador2_vidas', 3)
+        
+        # Determinar ganador
+        if jugador1_vidas <= 0:
+            ganador = 2
+        elif jugador2_vidas <= 0:
+            ganador = 1
+        elif jugador1_puntos > jugador2_puntos:
+            ganador = 1
+        elif jugador2_puntos > jugador1_puntos:
+            ganador = 2
+        else:
+            ganador = 0  # Empate
+        
+        return render_template("resultado.html",
+                             modo="multijugador",
+                             ganador=ganador,
+                             jugador1_puntos=jugador1_puntos,
+                             jugador2_puntos=jugador2_puntos,
+                             jugador1_vidas=jugador1_vidas,
+                             jugador2_vidas=jugador2_vidas)
 
 if __name__ == "__main__":
     app.run(debug=True, host='127.0.0.1', port=5000)
