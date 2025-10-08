@@ -259,7 +259,7 @@ async function verificar(pregunta, respuestaSeleccionada, respuestaCorrecta) {
       
       document.getElementById("pregunta").innerHTML = `
         <div class="text-center">
-          <h2 class="text-4xl mb-4">❌ Incorrecto</h2>
+          <h2 class="text-4xl mb-4"> Incorrecto</h2>
           ${mensajeTurno}
           <p class="text-xl mb-2 text-red-300">Tu respuesta: <strong>${respuestaSeleccionada}</strong></p>
           <p class="text-xl mb-4">La respuesta correcta era: <span class="text-yellow-300 font-bold">${respuestaCorrecta}</span></p>
@@ -273,7 +273,7 @@ async function verificar(pregunta, respuestaSeleccionada, respuestaCorrecta) {
 
   } catch (error) {
     console.error('Error verificando respuesta:', error);
-    alert("❌ Error al verificar la respuesta.");
+    alert(" Error al verificar la respuesta.");
   }
 }
 

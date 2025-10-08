@@ -21,7 +21,7 @@ try:
     prolog.consult("preguntas.pl")
     print("✅ Prolog inicializado correctamente")
 except Exception as e:
-    print(f"❌ Error inicializando Prolog: {e}")
+    print(f" Error inicializando Prolog: {e}")
     prolog = None
 
 def limpiar_string(valor):
@@ -90,7 +90,7 @@ def obtener_pregunta(categoria):
         })
         
     except Exception as e:
-        print(f"💥 Error: {str(e)}")
+        print(f" Error: {str(e)}")
         import traceback
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500

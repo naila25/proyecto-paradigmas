@@ -9,11 +9,11 @@
 <body class="bg-gradient-to-r from-green-400 to-blue-500 flex flex-col justify-center items-center min-h-screen text-white px-4">
   
   {% if modo == "individual" %}
-    <h1 class="text-5xl font-bold mb-4">🎉 ¡Juego terminado!</h1>
+    <h1 class="text-5xl font-bold mb-4"> ¡Juego terminado!</h1>
     <p class="text-2xl mb-6">Tu puntuación final: <span class="font-extrabold">{{ puntos }}</span> puntos</p>
   
   {% else %}
-    <h1 class="text-6xl font-bold mb-8">🏆 Resultado Final</h1>
+    <h1 class="text-6xl font-bold mb-8"> Resultado Final</h1>
     <p class="text-2xl">Jugador 1: {{ puntos_jugador1 }} puntos</p>
     <p class="text-2xl">Jugador 2: {{ puntos_jugador2 }} puntos</p>
   {% endif %}
