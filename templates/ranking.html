@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ranking - Trivia Universitaria</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes shine {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    .shine-effect {
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      background-size: 200% 100%;
+      animation: shine 3s infinite;
+    }
+    .rank-gold { color: #FFD700; }
+    .rank-silver { color: #C0C0C0; }
+    .rank-bronze { color: #CD7F32; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 min-h-screen text-white">
+  
+  <div class="container mx-auto px-4 py-8 max-w-6xl">
+    
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-5xl md:text-6xl font-extrabold mb-4">🏆 Ranking de Campeones</h1>
+      <p class="text-xl">Las mejores puntuaciones de todos los tiempos</p>
+    </div>
+
+    <!-- Estadísticas globales -->
+    <div class="bg-white/20 backdrop-blur-md rounded-xl p-6 mb-8 shadow-2xl">
+      <h2 class="text-3xl font-bold mb-4 text-center">📊 Estadísticas Globales</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white/10 rounded-lg p-4 text-center">
+          <p class="text-4xl font-bold text-yellow-300">{{ stats.total_partidas }}</p>
+          <p class="text-sm mt-2">Partidas Jugadas</p>
+        </div>
+        <div class="bg-white/10 rounded-lg p-4 text-center">
+          <p class="text-4xl font-bold text-green-300">{{ stats.mejor_puntuacion }}</p>
+          <p class="text-sm mt-2">Récord de Puntos</p>
+        </div>
+        <div class="bg-white/10 rounded-lg p-4 text-center">
+          <p class="text-4xl font-bold text-blue-300">{{ stats.promedio_puntos }}</p>
+          <p class="text-sm mt-2">Promedio de Puntos</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rankings -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      
+      <!-- Ranking Individual -->
+      <div class="bg-white/20 backdrop-blur-md rounded-xl p-6 shadow-2xl">
+        <h2 class="text-3xl font-bold mb-4 text-center">👤 Modo Individual</h2>
+        
+        {% if ranking_individual %}
+        <div class="space-y-3">
+          {% for puntos, fecha in ranking_individual %}
+          <div class="bg-white/10 rounded-lg p-4 flex items-center gap-4 hover:bg-white/20 transition {% if loop.index <= 3 %}shine-effect{% endif %}">
+            <div class="text-3xl font-bold w-12 text-center">
+              {% if loop.index == 1 %}
+              <span class="rank-gold">🥇</span>
+              {% elif loop.index == 2 %}
+              <span class="rank-silver">🥈</span>
+              {% elif loop.index == 3 %}
+              <span class="rank-bronze">🥉</span>
+              {% else %}
+              <span class="text-gray-300">#{{ loop.index }}</span>
+              {% endif %}
+            </div>
+            <div class="flex-1">
+              <p class="text-2xl font-bold text-yellow-300">{{ puntos }} puntos</p>
+              <p class="text-sm text-gray-200">{{ fecha }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-8">
+          <p class="text-xl text-gray-300">📭 Aún no hay partidas registradas</p>
+          <p class="text-sm mt-2">¡Sé el primero en aparecer aquí!</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Ranking Multijugador -->
+      <div class="bg-white/20 backdrop-blur-md rounded-xl p-6 shadow-2xl">
+        <h2 class="text-3xl font-bold mb-4 text-center">👥 Modo Multijugador</h2>
+        
+        {% if ranking_multi %}
+        <div class="space-y-3">
+          {% for j1_pts, j2_pts, ganador, fecha in ranking_multi %}
+          <div class="bg-white/10 rounded-lg p-4 hover:bg-white/20 transition">
+            <div class="flex justify-between items-center mb-2">
+              <div class="flex-1 text-center">
+                <p class="text-sm text-blue-300">Jugador 1</p>
+                <p class="text-xl font-bold {% if ganador == 1 %}text-yellow-300{% endif %}">
+                  {{ j1_pts }} pts {% if ganador == 1 %}👑{% endif %}
+                </p>
+              </div>
+              <div class="text-2xl px-2">VS</div>
+              <div class="flex-1 text-center">
+                <p class="text-sm text-red-300">Jugador 2</p>
+                <p class="text-xl font-bold {% if ganador == 2 %}text-yellow-300{% endif %}">
+                  {{ j2_pts }} pts {% if ganador == 2 %}👑{% endif %}
+                </p>
+              </div>
+            </div>
+            <p class="text-xs text-center text-gray-300">{{ fecha }}</p>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-8">
+          <p class="text-xl text-gray-300">📭 Aún no hay partidas registradas</p>
+          <p class="text-sm mt-2">¡Desafía a un amigo!</p>
+        </div>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- Mensajes motivacionales -->
+    <div class="bg-white/20 backdrop-blur-md rounded-xl p-6 mb-8 text-center shadow-2xl">
+      <h3 class="text-2xl font-bold mb-3">💡 ¿Sabías que...?</h3>
+      <p class="text-lg">
+        {% set tips = [
+          "Las preguntas difíciles dan 3 veces más puntos que las fáciles",
+          "Conseguir una racha de 3+ respuestas correctas te da puntos bonus",
+          "El comodín 50/50 puede salvarte en preguntas difíciles",
+          "Practicar regularmente mejora tu puntuación promedio",
+          "Las estadísticas por categoría te ayudan a identificar tus fortalezas"
+        ] %}
+        {{ tips[range(0, tips|length)|random] }}
+      </p>
+    </div>
+
+    <!-- Botones de navegación -->
+    <div class="flex flex-col md:flex-row gap-4 justify-center">
+      <a href="/juego?jugadores=1" 
+         class="bg-blue-500 hover:bg-blue-400 text-white px-8 py-4 rounded-lg text-xl font-bold shadow-lg transition transform hover:scale-105 text-center">
+        🎮 Jugar Solo
+      </a>
+      <a href="/juego?jugadores=2" 
+         class="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 rounded-lg text-xl font-bold shadow-lg transition transform hover:scale-105 text-center">
+        🎮 Jugar 2 Jugadores
+      </a>
+      <a href="/" 
+         class="bg-purple-500 hover:bg-purple-400 text-white px-8 py-4 rounded-lg text-xl font-bold shadow-lg transition transform hover:scale-105 text-center">
+        🏠 Volver al Inicio
+      </a>
+    </div>
+
+  </div>
+
+  <footer class="text-center py-6 mt-8">
+    <p class="text-sm opacity-75">Trivia Universitaria - Sistema de ranking actualizado en tiempo real</p>
+  </footer>
+
+</body>
+</html>
+
