@@ -5,6 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ruleta de Categorías - Trivia Universitaria</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes pulse-ring {
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.7);
+      }
+      70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(234, 179, 8, 0);
+      }
+      100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(234, 179, 8, 0);
+      }
+    }
+    .animate-pulse-ring {
+      animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+    }
+  </style>
 </head>
 <body class="bg-gradient-to-br from-indigo-700 via-purple-600 to-pink-500 min-h-screen text-white">
 
@@ -22,17 +41,39 @@
       <div class="relative mb-6">
         <canvas id="ruleta" width="400" height="400" class="rounded-full shadow-2xl border-4 border-white/20"></canvas>
         <button id="botonGirar"
-          class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-yellow-400 text-black px-8 py-3 rounded-full font-bold hover:bg-yellow-300 transition-all duration-200 hover:scale-105 shadow-lg">
+          class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-yellow-400 text-black px-8 py-3 rounded-full font-bold hover:bg-yellow-300 transition-all duration-200 hover:scale-105 shadow-lg animate-pulse-ring">
           GIRAR
         </button>
       </div>
 
       <!-- Instrucciones -->
-      <div class="text-center bg-white/10 backdrop-blur-md rounded-lg p-4 mb-6">
-        <p class="text-sm">🎯 <strong>Instrucciones:</strong> Haz clic en "GIRAR" para seleccionar una categoría</p>
+      <div class="text-center bg-white/10 backdrop-blur-md rounded-lg p-4 mb-6 max-w-2xl">
+        <p class="text-sm mb-2">🎯 <strong>Instrucciones:</strong> Haz clic en "GIRAR" para seleccionar una categoría</p>
         {% if num_jugadores == 2 %}
-        <p class="text-xs mt-2 text-yellow-300"> Si fallas 3 veces, pierdes automáticamente</p>
+        <p class="text-xs mt-2 text-yellow-300">⚠️ Si fallas 3 veces, pierdes automáticamente</p>
         {% endif %}
+        <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
+  <div class="bg-green-500/20 rounded p-2">
+    <p class="font-bold">⭐ Fácil</p>
+    <p>10 puntos</p>
+  </div>
+  <div class="bg-yellow-500/20 rounded p-2">
+    <p class="font-bold">⭐⭐ Media</p>
+    <p>20 puntos</p>
+  </div>
+  <div class="bg-red-500/20 rounded p-2">
+    <p class="font-bold">⭐⭐⭐ Difícil</p>
+    <p>30 puntos</p>
+  </div>
+  <div class="bg-orange-500/20 rounded p-2">
+    <p class="font-bold">🔥 Racha</p>
+    <p>+5 pts x racha (≥3)</p>
+  </div>
+</div>
+<div class="mt-2 bg-purple-500/20 rounded p-2">
+  <p class="font-bold text-sm mb-1">🎁 Comodines (1 uso cada uno)</p>
+  <p class="text-xs">🎯 50/50 | 🔄 Cambiar | ⏭️ Saltar</p>
+</div>
       </div>
     </div>
 
@@ -43,15 +84,17 @@
     </div>
 
     <!-- Footer -->
-    <div class="text-center mt-8">
+    <div class="text-center mt-8 flex gap-3 justify-center flex-wrap">
       <a href="/" class="inline-block bg-white/20 hover:bg-white/30 transition px-4 py-2 rounded-lg">
         🏠 Volver al inicio
+      </a>
+      <a href="/ranking" class="inline-block bg-white/20 hover:bg-white/30 transition px-4 py-2 rounded-lg">
+        🏆 Ver Ranking
       </a>
     </div>
   </div>
 
-
- <script>
+  <script>
     const NUM_JUGADORES = parseInt('{{ num_jugadores|default(1) }}') || 1;
   </script>
 
