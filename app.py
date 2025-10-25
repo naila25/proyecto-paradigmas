@@ -46,10 +46,20 @@ def index():
     session.clear()
     return render_template("index.html")
 
+@app.route('/nombres')
+def nombres():
+    jugadores = request.args.get('jugadores', '1')
+    return render_template('nombres.html', jugadores=jugadores)
+
 @app.route('/juego')
 def juego():
     num_jugadores = request.args.get('jugadores', '1')
+    nombre1 = request.args.get('nombre1', 'Jugador 1')
+    nombre2 = request.args.get('nombre2', 'Jugador 2')
     
+    # Guardar nombres en la sesión
+    session['nombre1'] = nombre1
+    session['nombre2'] = nombre2
     # Inicializar juego
     session['num_jugadores'] = int(num_jugadores)
     session['turno_actual'] = 1
@@ -87,8 +97,8 @@ def juego():
     # Tiempo de inicio
     import time
     session['tiempo_inicio'] = int(time.time())
-    
-    return render_template("juego.html", num_jugadores=int(num_jugadores))
+
+    return render_template("juego.html", num_jugadores=int(num_jugadores), nombre1=nombre1, nombre2=nombre2)
 
 @app.route('/pregunta/<categoria>')
 def obtener_pregunta(categoria):
@@ -449,7 +459,7 @@ def resultado():
         mejor_racha = session.get('jugador1_mejor_racha', 0)
         
         # Guardar en base de datos
-        partida_id = guardar_partida("individual", puntos, 0, 1, duracion)
+        partida_id = guardar_partida("individual", puntos, 0, 1, duracion,session.get('nombre1','Jugador 1'),"")
         if partida_id:
             guardar_estadisticas(partida_id, stats)
         
@@ -466,7 +476,8 @@ def resultado():
         jugador2_vidas = session.get('jugador2_vidas', 3)
         jugador1_mejor_racha = session.get('jugador1_mejor_racha', 0)
         jugador2_mejor_racha = session.get('jugador2_mejor_racha', 0)
-        
+        nombre1 = session.get('nombre1', 'Jugador 1')
+        nombre2 = session.get('nombre2', 'Jugador 2')
         # Determinar ganador
         if jugador1_vidas <= 0:
             ganador = 2
@@ -480,7 +491,7 @@ def resultado():
             ganador = 0  # Empate
         
         # Guardar en base de datos
-        partida_id = guardar_partida("multijugador", jugador1_puntos, jugador2_puntos, ganador, duracion)
+        partida_id = guardar_partida("multijugador", jugador1_puntos, jugador2_puntos, ganador, duracion,session.get('nombre1','Jugador 1'),session.get('nombre2','Jugador 2'))
         if partida_id:
             guardar_estadisticas(partida_id, stats)
         
@@ -493,6 +504,8 @@ def resultado():
                              jugador2_vidas=jugador2_vidas,
                              jugador1_mejor_racha=jugador1_mejor_racha,
                              jugador2_mejor_racha=jugador2_mejor_racha,
+                            nombre1=nombre1,    
+                            nombre2=nombre2,
                              stats=stats,
                              duracion=duracion)
 

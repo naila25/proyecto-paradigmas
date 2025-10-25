@@ -20,6 +20,15 @@ def init_db():
                   jugador2_puntos INTEGER,
                   ganador INTEGER,
                   duracion INTEGER)''')
+       # 🟢 NUEVO BLOQUE - agrega columnas nombre1 y nombre2 si no existen
+    try:
+        c.execute("ALTER TABLE partidas ADD COLUMN nombre1 TEXT;")
+    except:
+        pass  # ya existe
+    try:
+        c.execute("ALTER TABLE partidas ADD COLUMN nombre2 TEXT;")
+    except:
+        pass  # ya existe
     
     # Tabla de estadísticas por categoría
     c.execute('''CREATE TABLE IF NOT EXISTS estadisticas
@@ -34,14 +43,14 @@ def init_db():
     conn.close()
     print("✅ Base de datos inicializada")
 
-def guardar_partida(modo, j1_puntos, j2_puntos, ganador, duracion=0):
+def guardar_partida(modo, j1_puntos, j2_puntos, ganador, duracion=0, nombre1=None, nombre2=None):
     """Guarda una partida en la base de datos"""
     try:
         conn = sqlite3.connect(DB_NAME)
         c = conn.cursor()
         fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        c.execute("INSERT INTO partidas (fecha, modo, jugador1_puntos, jugador2_puntos, ganador, duracion) VALUES (?, ?, ?, ?, ?, ?)",
-                  (fecha, modo, j1_puntos, j2_puntos, ganador, duracion))
+        c.execute("INSERT INTO partidas (fecha, modo, jugador1_puntos, jugador2_puntos, ganador, duracion, nombre1, nombre2) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                  (fecha, modo, j1_puntos, j2_puntos, ganador, duracion, nombre1, nombre2))
         partida_id = c.lastrowid
         conn.commit()
         conn.close()
@@ -75,7 +84,7 @@ def obtener_ranking(modo='individual', limit=10):
                          ORDER BY puntos DESC 
                          LIMIT ?""", (limit,))
         else:
-            c.execute("""SELECT jugador1_puntos, jugador2_puntos, ganador, fecha 
+            c.execute("""SELECT jugador1_puntos, jugador2_puntos, ganador, fecha , nombre1, nombre2
                          FROM partidas 
                          WHERE modo='multijugador' 
                          ORDER BY fecha DESC 

@@ -59,7 +59,9 @@
         
         {% if ranking_individual %}
         <div class="space-y-3">
-          {% for puntos, fecha in ranking_individual %}
+          {% for puntos, fecha, nombre1 in ranking_individual %}
+          <p class="text-lg font-semibold text-blue-200">{{ nombre1 or 'Jugador' }}</p>
+
           <div class="bg-white/10 rounded-lg p-4 flex items-center gap-4 hover:bg-white/20 transition {% if loop.index <= 3 %}shine-effect{% endif %}">
             <div class="text-3xl font-bold w-12 text-center">
               {% if loop.index == 1 %}
@@ -93,18 +95,18 @@
         
         {% if ranking_multi %}
         <div class="space-y-3">
-          {% for j1_pts, j2_pts, ganador, fecha in ranking_multi %}
+          {% for j1_pts, j2_pts, ganador, fecha, nombre1, nombre2 in ranking_multi %}
           <div class="bg-white/10 rounded-lg p-4 hover:bg-white/20 transition">
             <div class="flex justify-between items-center mb-2">
               <div class="flex-1 text-center">
-                <p class="text-sm text-blue-300">Jugador 1</p>
+                <p class="text-sm text-blue-300">{{ nombre1 or 'Jugador 1' }}</p>
                 <p class="text-xl font-bold {% if ganador == 1 %}text-yellow-300{% endif %}">
                   {{ j1_pts }} pts {% if ganador == 1 %}👑{% endif %}
                 </p>
               </div>
               <div class="text-2xl px-2">VS</div>
               <div class="flex-1 text-center">
-                <p class="text-sm text-red-300">Jugador 2</p>
+                <p class="text-sm text-red-300">{{ nombre2 or 'Jugador2' }}</p>
                 <p class="text-xl font-bold {% if ganador == 2 %}text-yellow-300{% endif %}">
                   {{ j2_pts }} pts {% if ganador == 2 %}👑{% endif %}
                 </p>
