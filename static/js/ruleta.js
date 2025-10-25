@@ -66,49 +66,54 @@ function dibujarRuleta() {
 
 function actualizarInfoJugadores() {
   const infoDiv = document.getElementById("info-jugadores");
-  
   if (estadoJuego.numJugadores === 1) {
-    const rachaHTML = estadoJuego.jugador1Racha >= 3 
-      ? `<p class="text-lg">🔥 Racha: <span class="text-yellow-300 font-bold">${estadoJuego.jugador1Racha}</span></p>` 
+    const vidas = '❤️'.repeat(estadoJuego.jugador1Vidas) + '🖤'.repeat(3 - estadoJuego.jugador1Vidas);
+    const rachaHTML = estadoJuego.jugador1Racha >= 3
+      ? `<p class="text-lg">🔥 Racha: <span class="text-yellow-300 font-bold">${estadoJuego.jugador1Racha}</span></p>`
       : '';
-    
+
     infoDiv.innerHTML = `
-      <div class="bg-white/20 backdrop-blur-md rounded-lg p-4 inline-block">
-        <p class="text-2xl font-bold">Puntos: ${estadoJuego.jugador1Puntos}</p>
+      <div class="bg-blue-500/30 backdrop-blur-md rounded-lg p-4 inline-block text-center">
+        <p class="text-xl font-bold">👤 ${estadoJuego.nombre1}</p>
+        <p class="text-2xl">${estadoJuego.jugador1Puntos} puntos</p>
+        <p class="text-lg">${vidas}</p>
         ${rachaHTML}
       </div>
     `;
   } else {
+
     const turno1 = estadoJuego.turnoActual === 1 ? 'ring-4 ring-yellow-400 animate-pulse' : '';
     const turno2 = estadoJuego.turnoActual === 2 ? 'ring-4 ring-yellow-400 animate-pulse' : '';
-    
+
     const vidas1 = '❤️'.repeat(estadoJuego.jugador1Vidas) + '🖤'.repeat(3 - estadoJuego.jugador1Vidas);
     const vidas2 = '❤️'.repeat(estadoJuego.jugador2Vidas) + '🖤'.repeat(3 - estadoJuego.jugador2Vidas);
-    
-    const racha1HTML = estadoJuego.jugador1Racha >= 3 
-      ? `<p class="text-sm">🔥 Racha: ${estadoJuego.jugador1Racha}</p>` 
+
+    const racha1HTML = estadoJuego.jugador1Racha >= 3
+      ? `<p class="text-sm">🔥 Racha: ${estadoJuego.jugador1Racha}</p>`
       : '';
-    const racha2HTML = estadoJuego.jugador2Racha >= 3 
-      ? `<p class="text-sm">🔥 Racha: ${estadoJuego.jugador2Racha}</p>` 
+    const racha2HTML = estadoJuego.jugador2Racha >= 3
+      ? `<p class="text-sm">🔥 Racha: ${estadoJuego.jugador2Racha}</p>`
       : '';
-    
+
     infoDiv.innerHTML = `
       <div class="flex gap-4 justify-center flex-wrap">
         <div class="bg-blue-500/30 backdrop-blur-md rounded-lg p-4 ${turno1} transition-all">
-          <p class="text-xl font-bold">👤 Jugador 1</p>
+          <p class="text-xl font-bold">👤 ${estadoJuego.nombre1}</p>
           <p class="text-2xl">${estadoJuego.jugador1Puntos} puntos</p>
           <p class="text-lg">${vidas1}</p>
           ${racha1HTML}
         </div>
         <div class="bg-red-500/30 backdrop-blur-md rounded-lg p-4 ${turno2} transition-all">
-          <p class="text-xl font-bold">👤 Jugador 2</p>
+          <p class="text-xl font-bold">👤 ${estadoJuego.nombre2}</p>
           <p class="text-2xl">${estadoJuego.jugador2Puntos} puntos</p>
           <p class="text-lg">${vidas2}</p>
           ${racha2HTML}
         </div>
       </div>
       <p class="mt-2 text-yellow-300 text-lg font-bold">
-        🎮 Turno del Jugador ${estadoJuego.turnoActual}
+        🎮 Turno de ${estadoJuego.turnoActual === 1 ? estadoJuego.nombre1 : estadoJuego.nombre2}
+
+
       </p>
     `;
   }
@@ -118,7 +123,7 @@ async function cargarEstadoJuego() {
   try {
     const res = await fetch('/estado-juego');
     const data = await res.json();
-    
+
     estadoJuego.numJugadores = data.num_jugadores;
     estadoJuego.turnoActual = data.turno_actual;
     estadoJuego.jugador1Puntos = data.jugador1_puntos;
@@ -134,7 +139,9 @@ async function cargarEstadoJuego() {
     estadoJuego.jugador1Racha = data.jugador1_racha;
     estadoJuego.jugador2Racha = data.jugador2_racha;
     estadoJuego.juegoTerminado = data.juego_terminado;
-    
+    estadoJuego.nombre1 = NOMBRE1;
+    estadoJuego.nombre2 = NOMBRE2;
+
     actualizarInfoJugadores();
   } catch (error) {
     console.error('Error cargando estado:', error);
@@ -147,11 +154,11 @@ function reproducirSonido(tipo) {
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
-    
+
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
-    
-    switch(tipo) {
+
+    switch (tipo) {
       case 'correcto':
         oscillator.frequency.value = 800;
         gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
@@ -251,7 +258,7 @@ async function cargarPregunta(categoria) {
     opcionesOriginales = [...data.opciones];
     opcionesEliminadas = [];
 
-    const opcionesHTML = data.opciones.map(opcion => 
+    const opcionesHTML = data.opciones.map(opcion =>
       `<button onclick="verificar('${data.pregunta.replace(/'/g, "\\'")}', '${opcion.replace(/'/g, "\\'")}', '${data.respuesta.replace(/'/g, "\\'")}', '${categoria}', ${data.puntos}); return false;" 
               class="opcion-btn bg-white text-purple-700 px-6 py-3 rounded-lg hover:bg-purple-100 transition font-semibold w-full sm:w-auto min-w-[200px] shadow-md hover:shadow-lg transform hover:scale-105">
          ${opcion}
@@ -260,26 +267,27 @@ async function cargarPregunta(categoria) {
 
     let turnoMensaje = '';
     if (estadoJuego.numJugadores === 2) {
-      turnoMensaje = `<p class="mb-2 text-xl font-bold text-yellow-300">🎮 Turno del Jugador ${estadoJuego.turnoActual}</p>`;
+      turnoMensaje = `<p class="mb-2 text-xl font-bold text-yellow-300">
+      🎮 Turno de ${estadoJuego.turnoActual === 1 ? estadoJuego.nombre1 : estadoJuego.nombre2}</p>`;
     }
 
     // Mostrar comodines disponibles
     let comodinHTML = '';
-    const tieneComodin5050 = estadoJuego.numJugadores === 1 
-      ? estadoJuego.jugador1Comodin5050 
+    const tieneComodin5050 = estadoJuego.numJugadores === 1
+      ? estadoJuego.jugador1Comodin5050
       : (estadoJuego.turnoActual === 1 ? estadoJuego.jugador1Comodin5050 : estadoJuego.jugador2Comodin5050);
 
-    const tieneComodinCambiar = estadoJuego.numJugadores === 1 
-      ? estadoJuego.jugador1ComodinCambiar 
+    const tieneComodinCambiar = estadoJuego.numJugadores === 1
+      ? estadoJuego.jugador1ComodinCambiar
       : (estadoJuego.turnoActual === 1 ? estadoJuego.jugador1ComodinCambiar : estadoJuego.jugador2ComodinCambiar);
 
-    const tieneComodinSaltar = estadoJuego.numJugadores === 1 
-      ? estadoJuego.jugador1ComodinSaltar 
+    const tieneComodinSaltar = estadoJuego.numJugadores === 1
+      ? estadoJuego.jugador1ComodinSaltar
       : (estadoJuego.turnoActual === 1 ? estadoJuego.jugador1ComodinSaltar : estadoJuego.jugador2ComodinSaltar);
 
     if (tieneComodin5050 || tieneComodinCambiar || tieneComodinSaltar) {
       comodinHTML = '<div class="mb-4 flex gap-2 justify-center flex-wrap">';
-      
+
       if (tieneComodin5050 && data.opciones.length > 2) {
         comodinHTML += `
           <button onclick="usarComodin5050(); return false;" 
@@ -289,7 +297,7 @@ async function cargarPregunta(categoria) {
           </button>
         `;
       }
-      
+
       if (tieneComodinCambiar) {
         comodinHTML += `
           <button onclick="usarComodinCambiar(); return false;" 
@@ -299,7 +307,7 @@ async function cargarPregunta(categoria) {
           </button>
         `;
       }
-      
+
       if (tieneComodinSaltar) {
         comodinHTML += `
           <button onclick="usarComodinSaltar(); return false;" 
@@ -309,7 +317,7 @@ async function cargarPregunta(categoria) {
           </button>
         `;
       }
-      
+
       comodinHTML += '</div>';
     }
 
@@ -340,7 +348,7 @@ async function cargarPregunta(categoria) {
 
 async function usarComodin5050() {
   if (!preguntaActual) return;
-  
+
   try {
     const res = await fetch('/usar-comodin', {
       method: 'POST',
@@ -351,18 +359,18 @@ async function usarComodin5050() {
         respuesta_correcta: preguntaActual.respuesta
       })
     });
-    
+
     if (!res.ok) {
       const error = await res.json();
       alert(error.error || 'No puedes usar este comodín');
       return;
     }
-    
+
     const data = await res.json();
-    
+
     if (data.success) {
       opcionesEliminadas = data.opciones_eliminadas;
-      
+
       // Actualizar estado local
       if (estadoJuego.numJugadores === 1) {
         estadoJuego.jugador1Comodin5050 = false;
@@ -373,13 +381,13 @@ async function usarComodin5050() {
           estadoJuego.jugador2Comodin5050 = false;
         }
       }
-      
+
       // Eliminar botón de comodín
       const btnComodin = document.getElementById('btn-comodin-5050');
       if (btnComodin) {
         btnComodin.remove();
       }
-      
+
       // Actualizar las opciones en pantalla
       const botonesOpciones = document.querySelectorAll('.opcion-btn');
       botonesOpciones.forEach(btn => {
@@ -391,7 +399,7 @@ async function usarComodin5050() {
           btn.classList.remove('hover:bg-purple-100', 'hover:scale-105');
         }
       });
-      
+
       reproducirSonido('correcto');
     }
   } catch (error) {
@@ -402,7 +410,7 @@ async function usarComodin5050() {
 
 async function usarComodinCambiar() {
   if (!preguntaActual) return;
-  
+
   try {
     const res = await fetch('/usar-comodin', {
       method: 'POST',
@@ -414,15 +422,15 @@ async function usarComodinCambiar() {
         respuesta_correcta: preguntaActual.respuesta
       })
     });
-    
+
     if (!res.ok) {
       const error = await res.json();
       alert(error.error || 'No puedes usar este comodín');
       return;
     }
-    
+
     const data = await res.json();
-    
+
     if (data.success && data.tipo === 'cambiar') {
       // Actualizar estado local
       if (estadoJuego.numJugadores === 1) {
@@ -434,14 +442,14 @@ async function usarComodinCambiar() {
           estadoJuego.jugador2ComodinCambiar = false;
         }
       }
-      
+
       reproducirSonido('correcto');
-      
+
       // Recargar pregunta con los nuevos datos
       preguntaActual = data;
       opcionesOriginales = [...data.opciones];
       opcionesEliminadas = [];
-      
+
       // Actualizar visualmente
       const categoriaEmojis = {
         'historia': '🏛️',
@@ -462,7 +470,7 @@ async function usarComodinCambiar() {
         'dificil': 'text-red-300'
       };
 
-      const opcionesHTML = data.opciones.map(opcion => 
+      const opcionesHTML = data.opciones.map(opcion =>
         `<button onclick="verificar('${data.pregunta.replace(/'/g, "\\'")}', '${opcion.replace(/'/g, "\\'")}', '${data.respuesta.replace(/'/g, "\\'")}', '${data.categoria}', ${data.puntos}); return false;" 
                 class="opcion-btn bg-white text-purple-700 px-6 py-3 rounded-lg hover:bg-purple-100 transition font-semibold w-full sm:w-auto min-w-[200px] shadow-md hover:shadow-lg transform hover:scale-105">
            ${opcion}
@@ -475,18 +483,18 @@ async function usarComodinCambiar() {
       }
 
       // Actualizar comodines disponibles
-      const tieneComodin5050 = estadoJuego.numJugadores === 1 
-        ? estadoJuego.jugador1Comodin5050 
+      const tieneComodin5050 = estadoJuego.numJugadores === 1
+        ? estadoJuego.jugador1Comodin5050
         : (estadoJuego.turnoActual === 1 ? estadoJuego.jugador1Comodin5050 : estadoJuego.jugador2Comodin5050);
 
-      const tieneComodinSaltar = estadoJuego.numJugadores === 1 
-        ? estadoJuego.jugador1ComodinSaltar 
+      const tieneComodinSaltar = estadoJuego.numJugadores === 1
+        ? estadoJuego.jugador1ComodinSaltar
         : (estadoJuego.turnoActual === 1 ? estadoJuego.jugador1ComodinSaltar : estadoJuego.jugador2ComodinSaltar);
 
       let comodinHTML = '';
       if (tieneComodin5050 || tieneComodinSaltar) {
         comodinHTML = '<div class="mb-4 flex gap-2 justify-center flex-wrap">';
-        
+
         if (tieneComodin5050 && data.opciones.length > 2) {
           comodinHTML += `
             <button onclick="usarComodin5050(); return false;" 
@@ -496,7 +504,7 @@ async function usarComodinCambiar() {
             </button>
           `;
         }
-        
+
         if (tieneComodinSaltar) {
           comodinHTML += `
             <button onclick="usarComodinSaltar(); return false;" 
@@ -506,7 +514,7 @@ async function usarComodinCambiar() {
             </button>
           `;
         }
-        
+
         comodinHTML += '</div>';
       }
 
@@ -532,7 +540,7 @@ async function usarComodinCambiar() {
 
 async function usarComodinSaltar() {
   if (!preguntaActual) return;
-  
+
   try {
     const res = await fetch('/usar-comodin', {
       method: 'POST',
@@ -541,15 +549,15 @@ async function usarComodinSaltar() {
         comodin: 'saltar'
       })
     });
-    
+
     if (!res.ok) {
       const error = await res.json();
       alert(error.error || 'No puedes usar este comodín');
       return;
     }
-    
+
     const data = await res.json();
-    
+
     if (data.success && data.tipo === 'saltar') {
       // Actualizar estado local
       if (estadoJuego.numJugadores === 1) {
@@ -561,9 +569,9 @@ async function usarComodinSaltar() {
           estadoJuego.jugador2ComodinSaltar = false;
         }
       }
-      
+
       reproducirSonido('correcto');
-      
+
       // Mostrar mensaje y continuar
       document.getElementById("pregunta").innerHTML = `
         <div class="text-center animate-bounce">
@@ -587,8 +595,8 @@ async function verificar(pregunta, respuestaSeleccionada, respuestaCorrecta, cat
     const res = await fetch('/verificar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        pregunta, 
+      body: JSON.stringify({
+        pregunta,
         respuesta: respuestaSeleccionada,
         categoria: categoria,
         puntos: puntos
@@ -606,16 +614,16 @@ async function verificar(pregunta, respuestaSeleccionada, respuestaCorrecta, cat
       estadoJuego.jugador1Racha = data.jugador1_racha;
       estadoJuego.jugador2Racha = data.jugador2_racha;
       estadoJuego.juegoTerminado = data.juego_terminado;
-      
+
       actualizarInfoJugadores();
-      
+
       if (data.juego_terminado) {
         reproducirSonido('correcto');
         // Juego terminado
         setTimeout(() => {
           window.location.href = '/resultado';
         }, 3000);
-        
+
         document.getElementById("pregunta").innerHTML = `
           <div class="text-center animate-bounce">
             <h2 class="text-5xl mb-4">🏆 ¡JUEGO TERMINADO!</h2>
@@ -633,34 +641,34 @@ async function verificar(pregunta, respuestaSeleccionada, respuestaCorrecta, cat
 
     if (data.correcta) {
       reproducirSonido('correcto');
-      
+
       let mensajeTurno = '';
       let mensajeRacha = '';
       let bonusRachaMsg = '';
-      
+
       if (data.modo === "multijugador") {
         const jugadorAnterior = data.turno_actual === 1 ? 2 : 1;
         const rachaActual = jugadorAnterior === 1 ? data.jugador1_racha : data.jugador2_racha;
-        
+
         if (rachaActual >= 3) {
           mensajeRacha = `<p class="text-2xl mb-2 text-orange-400">🔥 ¡RACHA DE ${rachaActual}! 🔥</p>`;
         }
-        
+
         if (data.bonus_racha > 0) {
           bonusRachaMsg = `<p class="text-xl text-yellow-300">+${data.bonus_racha} puntos de bonus por racha!</p>`;
         }
-        
+
         mensajeTurno = `<p class="text-lg mb-2">Jugador ${jugadorAnterior} continúa...</p>`;
       } else {
         if (data.racha >= 3) {
           mensajeRacha = `<p class="text-2xl mb-2 text-orange-400">🔥 ¡RACHA DE ${data.racha}! 🔥</p>`;
         }
-        
+
         if (data.bonus_racha > 0) {
           bonusRachaMsg = `<p class="text-xl text-yellow-300">+${data.bonus_racha} puntos de bonus por racha!</p>`;
         }
       }
-      
+
       document.getElementById("pregunta").innerHTML = `
         <div class="text-center animate-pulse">
           <h2 class="text-4xl mb-4">✅ ¡Correcto!</h2>
@@ -675,27 +683,61 @@ async function verificar(pregunta, respuestaSeleccionada, respuestaCorrecta, cat
           </div>
         </div>
       `;
+
     } else {
       reproducirSonido('incorrecto');
-      
+
+      // ⚠️ Si es modo 1 jugador, restamos una vida
+      if (data.modo === "individual") {
+        estadoJuego.jugador1Vidas -= 1;
+
+        // Si se queda sin vidas, termina el juego
+        if (estadoJuego.jugador1Vidas <= 0) {
+          estadoJuego.juegoTerminado = true;
+
+          document.getElementById("pregunta").innerHTML = `
+        <div class="text-center animate-bounce">
+          <h2 class="text-5xl mb-4 text-red-400">💀 ¡Juego terminado!</h2>
+          <p class="text-2xl mb-4">Te quedaste sin vidas.</p>
+          <p class="text-lg mb-4">La respuesta correcta era: <span class="text-yellow-300 font-bold">${respuestaCorrecta}</span></p>
+          <p class="text-2xl mb-4 text-green-300 font-semibold">Puntaje final: ${estadoJuego.jugador1Puntos}</p>
+          <button onclick="terminarJuego()" class="bg-red-500 px-6 py-3 rounded-lg hover:bg-red-400 transition font-bold shadow-lg transform hover:scale-105">
+            🏁 Ver resultado
+          </button>
+        </div>
+      `;
+
+          setTimeout(() => {
+            window.location.href = '/resultado';
+          }, 4000);
+
+          return;
+        }
+      }
+
+      // 💬 Si todavía tiene vidas, mostrar mensaje normal
       let mensajeTurno = '';
       if (data.modo === "multijugador") {
         mensajeTurno = `<p class="text-lg mb-2 text-yellow-300">Turno del Jugador ${data.turno_actual}</p>`;
       }
-      
+
+      actualizarInfoJugadores(); // 🔁 Refresca los corazones o datos
+
       document.getElementById("pregunta").innerHTML = `
-        <div class="text-center">
-          <h2 class="text-4xl mb-4">❌ Incorrecto</h2>
-          ${mensajeTurno}
-          <p class="text-xl mb-2 text-red-300">Tu respuesta: <strong>${respuestaSeleccionada}</strong></p>
-          <p class="text-xl mb-4">La respuesta correcta era: <span class="text-yellow-300 font-bold">${respuestaCorrecta}</span></p>
-          <div class="flex gap-3 justify-center flex-wrap mt-6">
-            <button onclick="nuevaPregunta()" class="bg-blue-500 px-6 py-3 rounded-lg hover:bg-blue-400 transition font-bold shadow-lg transform hover:scale-105">🎯 Continuar</button>
-            <button onclick="terminarJuego()" class="bg-red-500 px-6 py-3 rounded-lg hover:bg-red-400 transition font-bold shadow-lg transform hover:scale-105">🏁 Terminar juego</button>
-          </div>
-        </div>
-      `;
+    <div class="text-center">
+      <h2 class="text-4xl mb-4">❌ Incorrecto</h2>
+      ${mensajeTurno}
+      <p class="text-xl mb-2 text-red-300">Tu respuesta: <strong>${respuestaSeleccionada}</strong></p>
+      <p class="text-xl mb-4">La respuesta correcta era: <span class="text-yellow-300 font-bold">${respuestaCorrecta}</span></p>
+      <p class="text-lg mb-4 text-pink-300">💔 Te queda${estadoJuego.jugador1Vidas === 1 ? '' : 'n'} ${estadoJuego.jugador1Vidas} vida${estadoJuego.jugador1Vidas === 1 ? '' : 's'}</p>
+      <div class="flex gap-3 justify-center flex-wrap mt-6">
+        <button onclick="nuevaPregunta()" class="bg-blue-500 px-6 py-3 rounded-lg hover:bg-blue-400 transition font-bold shadow-lg transform hover:scale-105">🎯 Continuar</button>
+        <button onclick="terminarJuego()" class="bg-red-500 px-6 py-3 rounded-lg hover:bg-red-400 transition font-bold shadow-lg transform hover:scale-105">🏁 Terminar juego</button>
+      </div>
+    </div>
+  `;
     }
+
 
   } catch (error) {
     console.error('Error verificando respuesta:', error);
@@ -713,7 +755,7 @@ function nuevaPregunta() {
   boton.style.backgroundColor = "#EAB308";
   boton.style.color = "black";
   boton.textContent = "GIRAR";
-  
+
   // Resetear variables de pregunta
   preguntaActual = null;
   opcionesOriginales = [];
