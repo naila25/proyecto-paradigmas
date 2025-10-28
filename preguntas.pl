@@ -8,7 +8,7 @@ categoria(arte).
 categoria(deportes).
 categoria(musica).
 categoria(geografia).
-categoria(entretenimiento).
+categoria(cine).
 
 % Niveles de dificultad
 dificultad(facil).

@@ -1,13 +1,13 @@
 
-Estadística de cuales preguntas se pierden más
+Estadística de cuales preguntas se pierden más ***
 
- Agregar más  categorías, como música 
+   /// Agregar más  categorías, como música 
 
  vaya aumentando la dificultad de la pregunta con forme se vaya ganando
  
  si alguien pierde preguntas de deporte que le sigan saliendo de esas
 
- Agregar tildes,  virgulilla
+ Agregar tildes,  virgulilla 
 
  corregir errores en los codigos, RESULTADO.HTML, DATABASE.PY APP.PY
 
@@ -23,5 +23,5 @@ Estadística de cuales preguntas se pierden más
 
   mostrar cuantos puntos lleva cada jugar cuando esten jugando 2 personas
 
-  agregar temporizador para que puedan responder en 20 segundos
+  agregar temporizador para que puedan responder en 20 segundos *****
   

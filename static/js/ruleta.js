@@ -325,7 +325,7 @@ async function cargarPregunta(categoria) {
       comodinHTML += '</div>';
     }
 
-    // ESTA ES LA LÍNEA QUE FALTABA - Mostrar la pregunta en pantalla
+    // - Mostrar la pregunta en pantalla
     document.getElementById("pregunta").innerHTML = `
       <div class="text-center">
         ${turnoMensaje}

@@ -111,7 +111,7 @@ def obtener_pregunta(categoria):
         if prolog is None:
             return jsonify({"error": "Prolog no está disponible"}), 500
         
-        categorias_validas = ['historia', 'ciencia', 'arte', 'deportes','musica', 'geografia', 'entretenimiento']
+        categorias_validas = ['historia', 'ciencia', 'arte', 'deportes','musica', 'geografia', 'cine']
         if categoria not in categorias_validas:
             return jsonify({"error": "Categoría no válida"}), 400
         
