@@ -6,6 +6,9 @@ categoria(historia).
 categoria(ciencia).
 categoria(arte).
 categoria(deportes).
+categoria(musica).
+categoria(geografia).
+categoria(entretenimiento).
 
 % Niveles de dificultad
 dificultad(facil).
@@ -15,6 +18,7 @@ dificultad(dificil).
 % Formato: pregunta(Categoria, Pregunta, Opciones, Respuesta, Dificultad)
 
 % ===== PREGUNTAS DE HISTORIA =====
+
 pregunta(historia, 'Quien descubrio America?', 
          ['Cristobal Colon', 'Americo Vespucio', 'Fernando de Magallanes', 'Hernan Cortes'], 
          'Cristobal Colon', facil).
@@ -135,6 +139,128 @@ pregunta(ciencia, 'Cual es el metal mas abundante en la Tierra?',
 pregunta(ciencia, 'Que es la fotosintesis?', 
          ['Proceso de plantas', 'Proceso de animales', 'Tipo de luz', 'Reaccion quimica'], 
          'Proceso de plantas', media).
+
+         % ===== PREGUNTAS DE MUSICA =====
+pregunta(musica, 'Quien es conocido como el Rey del Pop?', 
+         ['Michael Jackson','Elvis Presley','Prince','Freddie Mercury'], 
+         'Michael Jackson', facil).
+
+pregunta(musica, 'De que pais es originario el tango?', 
+         ['Argentina','Espana','Mexico','Italia'], 
+         'Argentina', media).
+
+pregunta(musica, 'Que compositor escribio la Quinta Sinfonia?', 
+         ['Mozart','Beethoven','Chopin','Bach'], 
+         'Beethoven', dificil).
+
+pregunta(musica, 'Que banda compuso el album Abbey Road?', 
+         ['The Beatles','Queen','The Rolling Stones','Pink Floyd'], 
+         'The Beatles', facil).
+
+pregunta(musica, 'Que cantante popularizo la cancion Thriller?', 
+         ['Michael Jackson','Madonna','Whitney Houston','Prince'], 
+         'Michael Jackson', facil).
+
+pregunta(musica, 'Que instrumento toca tradicionalmente un mariachi?', 
+         ['Guitarron','Saxofon','Bateria','Arpa'], 
+         'Guitarron', media).
+
+pregunta(musica, 'Quien compuso Las cuatro estaciones?', 
+         ['Vivaldi','Bach','Handel','Haydn'], 
+         'Vivaldi', media).
+
+pregunta(musica, 'Que genero musical nacio en Jamaica?', 
+         ['Reggae','Samba','Blues','Flamenco'], 
+         'Reggae', facil).
+
+pregunta(musica, 'Que cantante es apodado La Reina del Tejano?', 
+         ['Selena','Shakira','Gloria Estefan','Paulina Rubio'], 
+         'Selena', media).
+
+pregunta(musica, 'Que ciudad es cuna del grunge?', 
+         ['Seattle','Los Angeles','Nueva York','Chicago'], 
+         'Seattle', dificil).
+% ===== PREGUNTAS DE GEOGRAFIA =====
+pregunta(geografia, 'Cual es la capital de Australia?', 
+         ['Canberra','Sidney','Melbourne','Perth'], 
+         'Canberra', facil).
+
+pregunta(geografia, 'Cual es el rio mas largo del mundo?', 
+         ['Amazonas','Nilo','Yangtse','Misisipi'], 
+         'Amazonas', media).
+
+pregunta(geografia, 'En que continente esta Kazajistan?', 
+         ['Asia','Europa','Africa','Oceania'], 
+         'Asia', media).
+
+pregunta(geografia, 'Que oceano es el mas grande?', 
+         ['Pacifico','Atlantico','Indico','Artico'], 
+         'Pacifico', facil).
+
+pregunta(geografia, 'Que pais tiene mas islas?', 
+         ['Suecia','Indonesia','Filipinas','Noruega'], 
+         'Suecia', dificil).
+
+pregunta(geografia, 'Que montana es la mas alta del mundo?', 
+         ['Everest','K2','Kangchenjunga','Lhotse'], 
+         'Everest', facil).
+
+pregunta(geografia, 'La sabana africana se asocia sobre todo con que pais?', 
+         ['Kenia','Egipto','Sudafrica','Marruecos'], 
+         'Kenia', media).
+
+pregunta(geografia, 'Que mar bania a Jordania e Israel y es muy salado?', 
+         ['Mar Muerto','Mar Rojo','Mar Negro','Mar Aral'], 
+         'Mar Muerto', media).
+
+pregunta(geografia, 'Cual es la capital de Canada?', 
+         ['Ottawa','Toronto','Vancouver','Montreal'], 
+         'Ottawa', facil).
+
+pregunta(geografia, 'Que desierto es el mas grande del mundo?', 
+         ['Sahara','Arabia','Gobi','Kalahari'], 
+         'Sahara', dificil).
+% ===== PREGUNTAS DE ENTRETENIMIENTO =====
+pregunta(entretenimiento, 'En que anio se estreno Toy Story?', 
+         ['1995','1993','1997','1999'], 
+         '1995', media).
+
+pregunta(entretenimiento, 'Quien interpreta a Iron Man en el MCU?', 
+         ['Robert Downey Jr.','Chris Evans','Chris Hemsworth','Mark Ruffalo'], 
+         'Robert Downey Jr.', facil).
+
+pregunta(entretenimiento, 'Cual es la serie con el Trono de Hierro?', 
+         ['Game of Thrones','The Witcher','Vikings','The Crown'], 
+         'Game of Thrones', facil).
+
+pregunta(entretenimiento, 'Que pelicula gano el Oscar a Mejor Pelicula en 2020?', 
+         ['Parasitos','1917','Joker','Once Upon a Time in Hollywood'], 
+         'Parasitos', dificil).
+
+pregunta(entretenimiento, 'Como se llama el mago protagonista de J.K. Rowling?', 
+         ['Harry Potter','Hermione Granger','Ron Weasley','Draco Malfoy'], 
+         'Harry Potter', facil).
+
+pregunta(entretenimiento, 'Que franquicia tiene a Darth Vader?', 
+         ['Star Wars','Star Trek','Matrix','Alien'], 
+         'Star Wars', facil).
+
+pregunta(entretenimiento, 'Que director filmo Inception?', 
+         ['Christopher Nolan','Steven Spielberg','James Cameron','Quentin Tarantino'], 
+         'Christopher Nolan', media).
+
+pregunta(entretenimiento, 'Que superheroe dice Yo soy Batman?', 
+         ['Batman','Superman','Spider-Man','Flash'], 
+         'Batman', facil).
+
+pregunta(entretenimiento, 'Que famosa serie es de la ciudad de Springfield?', 
+         ['Los Simpson','Padre de Familia','South Park','Futurama'], 
+         'Los Simpson', media).
+
+pregunta(entretenimiento, 'En que pelicula aparece el anillo unico?', 
+         ['El Senor de los Anillos','Harry Potter','Narnia','Hobbiton'], 
+         'El Senor de los Anillos', dificil).
+
 
 % ===== PREGUNTAS DE ARTE =====
 pregunta(arte, 'Quien pinto la Mona Lisa?', 

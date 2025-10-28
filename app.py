@@ -18,9 +18,11 @@ logging.basicConfig(level=logging.DEBUG, encoding='utf-8')
 
 # Inicializar Prolog
 try:
+    import os
+    ruta_pl = os.path.join(os.path.dirname(__file__), "preguntas.pl")
     prolog = Prolog()
-    prolog.consult("preguntas.pl")
-    print("✅ Prolog inicializado correctamente")
+    prolog.consult(ruta_pl)
+    print(f"✅ Prolog inicializado correctamente desde: {ruta_pl}")
 except Exception as e:
     print(f"❌ Error inicializando Prolog: {e}")
     prolog = None
@@ -88,7 +90,10 @@ def juego():
         'historia': {'correctas': 0, 'total': 0},
         'ciencia': {'correctas': 0, 'total': 0},
         'arte': {'correctas': 0, 'total': 0},
-        'deportes': {'correctas': 0, 'total': 0}
+        'deportes': {'correctas': 0, 'total': 0},
+        'musica': {'correctas': 0, 'total': 0},
+        'geografia': {'correctas': 0, 'total': 0},
+        'entretenimiento': {'correctas': 0, 'total': 0}
     }
     
     # Tracking de preguntas usadas
@@ -106,7 +111,7 @@ def obtener_pregunta(categoria):
         if prolog is None:
             return jsonify({"error": "Prolog no está disponible"}), 500
         
-        categorias_validas = ['historia', 'ciencia', 'arte', 'deportes']
+        categorias_validas = ['historia', 'ciencia', 'arte', 'deportes','musica', 'geografia', 'entretenimiento']
         if categoria not in categorias_validas:
             return jsonify({"error": "Categoría no válida"}), 400
         
@@ -293,7 +298,11 @@ def verificar():
                 'historia': {'correctas': 0, 'total': 0},
                 'ciencia': {'correctas': 0, 'total': 0},
                 'arte': {'correctas': 0, 'total': 0},
-                'deportes': {'correctas': 0, 'total': 0}
+                'deportes': {'correctas': 0, 'total': 0},
+                'musica': {'correctas': 0, 'total': 0},
+                'geografia': {'correctas': 0, 'total': 0},
+                'entretenimiento': {'correctas': 0, 'total': 0}
+
             }
         
         if categoria in session['stats_categorias']:
