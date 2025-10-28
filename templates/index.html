@@ -7,130 +7,150 @@
   <title>Trivia Universitaria</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    @keyframes float {
+  
 
-      0%,
-      100% {
-        transform: translateY(0px);
-      }
-
-      50% {
-        transform: translateY(-20px);
-      }
+    /* 🎡 Ruleta */
+    .ruleta {
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      border: 8px solid white;
+      background: conic-gradient(#3B82F6 0deg 60deg,
+          #EAB308 60deg 120deg,
+          #EF4444 120deg 180deg,
+          #22C55E 180deg 240deg,
+          #a855f7 240deg 300deg,
+          #06b6d4 300deg 360deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
+      margin: 0 auto 2rem;
+      position: relative;
     }
 
-    .float-animation {
-      animation: float 3s ease-in-out infinite;
+    .ruleta::after {
+      content: "🎯";
+      font-size: 2rem;
+      position: absolute;
+    }
+
+    .categoria {
+      position: absolute;
+      color: white;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    .botones-jugadores a {
+      flex: 1;
     }
   </style>
 </head>
 
 <body
-  class="bg-gradient-to-r from-indigo-600 to-pink-500 flex flex-col justify-center items-center min-h-screen text-white">
+  class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 flex flex-col justify-center items-center min-h-screen text-white">
 
-  <div class="text-center max-w-4xl mx-auto px-4">
-    <h1 class="text-6xl md:text-7xl font-extrabold mb-4 float-animation">🎓 Trivia Universitaria</h1>
+  <div class="text-center max-w-4xl mx-auto px-4 py-8">
+    <!-- Título -->
+    <h1 class="text-6xl md:text-7xl font-extrabold mb-6 float-animation drop-shadow-lg">
+      🎓 Trivia Universitaria
+    </h1>
+
+    <!-- Ruleta de categorías -->
+    <div class="ruleta">
+     
+      <div class="categoria" style="top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1rem; opacity: 0.9;">
+        🎲
+      </div>
+    </div>
+
+    <!-- Descripción -->
     <p class="text-xl md:text-2xl mb-10 text-center max-w-2xl mx-auto">
-      Pon a prueba tus conocimientos en historia, ciencia, arte y deportes.
+      Pon a prueba tus conocimientos en historia, ciencia, arte, geografía, música, cine y deportes.
       ¡Gira la ruleta y demuestra lo que sabes!
     </p>
 
-    <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 mb-8">
-      <h2 class="text-2xl font-bold mb-3">✨ Características del Juego</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-left">
-        <div class="flex items-start gap-2">
-          <span class="text-2xl">🎯</span>
-          <p class="text-sm">Más de 60 preguntas en 4 categorías</p>
-        </div>
-        <div class="flex items-start gap-2">
-          <span class="text-2xl">⭐</span>
-          <p class="text-sm">3 niveles de dificultad con puntos variables</p>
-        </div>
-        <div class="flex items-start gap-2">
-          <span class="text-2xl">🔥</span>
-          <p class="text-sm">Sistema de rachas con bonus</p>
-        </div>
-        <div class="flex items-start gap-2">
-          <span class="text-2xl">🎁</span>
-          <p class="text-sm">Comodín 50/50 para ayudarte</p>
-        </div>
+    <!-- Cómo jugar -->
+    <h2 class="text-3xl font-bold mb-3">🕹️ Cómo jugar</h2>
+    <p class="text-lg mb-10 text-white/90 max-w-2xl mx-auto">
+      Elige tu modo de juego, ingresa tu nombre y compite para alcanzar el primer lugar en el ranking.
+    </p>
+
+    <!-- Formulario de nombres -->
+    <div id="form-nombres" class="bg-white/10 backdrop-blur-md rounded-xl p-4 hidden">
+      <div id="nombre-jugador1" class="mb-4">
+        <label class="block mb-2 font-semibold text-lg">👤 Nombre del Jugador 1:</label>
+        <input id="input-jugador1" type="text" class="w-full p-2 rounded text-black" placeholder="Escribe el nombre">
       </div>
+      <div id="nombre-jugador2" class="mb-4 hidden">
+        <label class="block mb-2 font-semibold text-lg">👥 Nombre del Jugador 2:</label>
+        <input id="input-jugador2" type="text" class="w-full p-2 rounded text-black" placeholder="Escribe el nombre">
+      </div>
+      <button id="btn-comenzar"
+        class="bg-yellow-400 text-indigo-900 px-8 py-3 rounded-full text-xl font-bold shadow-lg hover:scale-105 transition transform w-full">
+        🎮 Comenzar Juego
+      </button>
     </div>
 
-    <div class="flex flex-col gap-4 mb-6">
-      <!-- Formulario para ingresar nombres -->
-      <div id="form-nombres" class="bg-white/10 backdrop-blur-md rounded-xl p-4 hidden">
-        <div id="nombre-jugador1" class="mb-4">
-          <label class="block mb-2 font-semibold text-lg">👤 Nombre del Jugador 1:</label>
-          <input id="input-jugador1" type="text" class="w-full p-2 rounded text-black" placeholder="Escribe el nombre">
-        </div>
-        <div id="nombre-jugador2" class="mb-4 hidden">
-          <label class="block mb-2 font-semibold text-lg">👥 Nombre del Jugador 2:</label>
-          <input id="input-jugador2" type="text" class="w-full p-2 rounded text-black" placeholder="Escribe el nombre">
-        </div>
-        <button id="btn-comenzar"
-          class="bg-yellow-400 text-indigo-900 px-8 py-3 rounded-full text-xl font-bold shadow-lg hover:scale-105 transition transform w-full">
-          🎮 Comenzar Juego
-        </button>
-      </div>
-
-      <!-- Botones de selección -->
-      <div class="flex flex-col gap-4 mb-6">
-        <a href="/nombres?jugadores=1"
-          class="bg-white text-indigo-600 px-8 py-4 rounded-full text-2xl font-bold shadow-lg hover:scale-105 transition transform text-center">
-          👤 1 Jugador
-        </a>
-        <a href="/nombres?jugadores=2"
-          class="bg-yellow-400 text-indigo-900 px-8 py-4 rounded-full text-2xl font-bold shadow-lg hover:scale-105 transition transform text-center">
-          👥 2 Jugadores
-        </a>
-      </div>
-
-
-      <script>
-        let numJugadores = 1;
-
-        function mostrarFormulario(modo) {
-          numJugadores = modo;
-          document.getElementById('form-nombres').classList.remove('hidden');
-          document.getElementById('nombre-jugador1').classList.remove('hidden');
-          if (modo === 2) {
-            document.getElementById('nombre-jugador2').classList.remove('hidden');
-          } else {
-            document.getElementById('nombre-jugador2').classList.add('hidden');
-          }
-        }
-
-        document.getElementById('btn-comenzar').addEventListener('click', () => {
-          const j1 = document.getElementById('input-jugador1').value.trim();
-          const j2 = document.getElementById('input-jugador2').value.trim();
-
-          if (!j1 || (numJugadores === 2 && !j2)) {
-            alert(' Por favor, ingresa los nombres de los jugadores.');
-            return;
-          }
-
-          // Redirige al juego con los nombres en la URL
-          const params = new URLSearchParams();
-          params.append('jugadores', numJugadores);
-          params.append('nombre1', j1);
-          if (numJugadores === 2) params.append('nombre2', j2);
-
-          window.location.href = `/juego?${params.toString()}`;
-        });
-      </script>
-
-      <div class="mt-6">
-        <a href="/ranking"
-          class="inline-block bg-white/20 hover:bg-white/30 transition px-6 py-3 rounded-lg text-lg font-semibold">
-          🏆 Ver Ranking
-        </a>
-      </div>
+    <!-- Botones de selección -->
+    <div class="flex flex-col md:flex-row gap-4 mb-6 botones-jugadores justify-center">
+      <a href="/nombres?jugadores=1"
+        class="bg-white text-indigo-700 px-8 py-4 rounded-full text-2xl font-bold shadow-lg hover:scale-105 transition transform text-center">
+        👤 1 Jugador
+      </a>
+      <a href="/nombres?jugadores=2"
+        class="bg-yellow-400 text-indigo-900 px-8 py-4 rounded-full text-2xl font-bold shadow-lg hover:scale-105 transition transform text-center">
+        👥 2 Jugadores
+      </a>
     </div>
 
-    <footer class="absolute bottom-4 text-center text-sm opacity-75">
-      <p></p>
-    </footer>
+    <!-- Ranking debajo -->
+    <div class="mt-4">
+      <a href="/ranking"
+        class="bg-indigo-700 text-white px-10 py-4 rounded-full text-2xl font-bold shadow-lg hover:scale-105 transition transform text-center inline-block">
+        🏆 Ranking
+      </a>
+    </div>
+  </div>
+
+  <footer class="absolute bottom-4 text-center text-sm opacity-75">
+    <p></p>
+  </footer>
+
+  <script>
+    let numJugadores = 1;
+
+    function mostrarFormulario(modo) {
+      numJugadores = modo;
+      document.getElementById('form-nombres').classList.remove('hidden');
+      document.getElementById('nombre-jugador1').classList.remove('hidden');
+      if (modo === 2) {
+        document.getElementById('nombre-jugador2').classList.remove('hidden');
+      } else {
+        document.getElementById('nombre-jugador2').classList.add('hidden');
+      }
+    }
+
+    document.getElementById('btn-comenzar').addEventListener('click', () => {
+      const j1 = document.getElementById('input-jugador1').value.trim();
+      const j2 = document.getElementById('input-jugador2').value.trim();
+
+      if (!j1 || (numJugadores === 2 && !j2)) {
+        alert('Por favor, ingresa los nombres de los jugadores.');
+        return;
+      }
+
+      const params = new URLSearchParams();
+      params.append('jugadores', numJugadores);
+      params.append('nombre1', j1);
+      if (numJugadores === 2) params.append('nombre2', j2);
+
+      window.location.href = `/juego?${params.toString()}`;
+    });
+  </script>
+
 </body>
 
 </html>

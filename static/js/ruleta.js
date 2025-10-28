@@ -2,7 +2,7 @@ const canvas = document.getElementById("ruleta");
 const ctx = canvas.getContext("2d");
 const boton = document.getElementById("botonGirar");
 
-const categorias = ["arte","deportes","historia","ciencia","musica","geografia","entretenimiento"];
+const categorias = ["arte","deportes","historia","ciencia","musica","geografia","cine"];
 const colores    = ["#3B82F6","#EAB308","#EF4444","#22C55E","#a855f7","#06b6d4","#f97316"];
 
 const tam = canvas.width / 2;
@@ -235,7 +235,10 @@ async function cargarPregunta(categoria) {
       'historia': '🏛️',
       'ciencia': '🔬',
       'arte': '🎨',
-      'deportes': '⚽'
+      'deportes': '⚽',
+      'cine': '🎬',
+      'musica': '🎵',
+      'geografia': '🌍',
     };
 
     const dificultadEmojis = {
@@ -456,7 +459,10 @@ async function usarComodinCambiar() {
         'historia': '🏛️',
         'ciencia': '🔬',
         'arte': '🎨',
-        'deportes': '⚽'
+        'deportes': '⚽',
+        'cine': '🎬',
+        'musica': '🎵',
+        'geografia': '🌍'
       };
 
       const dificultadEmojis = {

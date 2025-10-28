@@ -220,44 +220,44 @@ pregunta(geografia, 'Cual es la capital de Canada?',
 pregunta(geografia, 'Que desierto es el mas grande del mundo?', 
          ['Sahara','Arabia','Gobi','Kalahari'], 
          'Sahara', dificil).
-% ===== PREGUNTAS DE ENTRETENIMIENTO =====
-pregunta(entretenimiento, 'En que anio se estreno Toy Story?', 
+% ===== PREGUNTAS DE CINE =====
+pregunta(cine, 'En que anio se estreno Toy Story?', 
          ['1995','1993','1997','1999'], 
          '1995', media).
 
-pregunta(entretenimiento, 'Quien interpreta a Iron Man en el MCU?', 
+pregunta(cine, 'Quien interpreta a Iron Man en el MCU?', 
          ['Robert Downey Jr.','Chris Evans','Chris Hemsworth','Mark Ruffalo'], 
          'Robert Downey Jr.', facil).
 
-pregunta(entretenimiento, 'Cual es la serie con el Trono de Hierro?', 
+pregunta(cine, 'Cual es la serie con el Trono de Hierro?', 
          ['Game of Thrones','The Witcher','Vikings','The Crown'], 
          'Game of Thrones', facil).
 
-pregunta(entretenimiento, 'Que pelicula gano el Oscar a Mejor Pelicula en 2020?', 
+pregunta(cine , 'Que pelicula gano el Oscar a Mejor Pelicula en 2020?', 
          ['Parasitos','1917','Joker','Once Upon a Time in Hollywood'], 
          'Parasitos', dificil).
 
-pregunta(entretenimiento, 'Como se llama el mago protagonista de J.K. Rowling?', 
+pregunta(cine, 'Como se llama el mago protagonista de J.K. Rowling?', 
          ['Harry Potter','Hermione Granger','Ron Weasley','Draco Malfoy'], 
          'Harry Potter', facil).
 
-pregunta(entretenimiento, 'Que franquicia tiene a Darth Vader?', 
+pregunta(cine, 'Que franquicia tiene a Darth Vader?', 
          ['Star Wars','Star Trek','Matrix','Alien'], 
          'Star Wars', facil).
 
-pregunta(entretenimiento, 'Que director filmo Inception?', 
+pregunta(cine, 'Que director filmo Inception?', 
          ['Christopher Nolan','Steven Spielberg','James Cameron','Quentin Tarantino'], 
          'Christopher Nolan', media).
 
-pregunta(entretenimiento, 'Que superheroe dice Yo soy Batman?', 
+pregunta(cine, 'Que superheroe dice Yo soy Batman?', 
          ['Batman','Superman','Spider-Man','Flash'], 
          'Batman', facil).
 
-pregunta(entretenimiento, 'Que famosa serie es de la ciudad de Springfield?', 
+pregunta(cine, 'Que famosa serie es de la ciudad de Springfield?', 
          ['Los Simpson','Padre de Familia','South Park','Futurama'], 
          'Los Simpson', media).
 
-pregunta(entretenimiento, 'En que pelicula aparece el anillo unico?', 
+pregunta(cine, 'En que pelicula aparece el anillo unico?', 
          ['El Senor de los Anillos','Harry Potter','Narnia','Hobbiton'], 
          'El Senor de los Anillos', dificil).
 
