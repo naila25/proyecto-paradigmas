@@ -43,6 +43,15 @@ def convertir_lista_prolog(lista_prolog):
         return [limpiar_string(item) for item in lista_prolog]
     return []
 
+def determinar_dificultad_actual(puntos):
+    """Determina la dificultad según los puntos acumulados"""
+    if puntos < 30:  # 0-29 puntos: fácil
+        return 'facil'
+    elif puntos < 80:  # 30-79 puntos: media
+        return 'media'
+    else:  # 80+ puntos: difícil
+        return 'dificil'
+
 @app.route('/')
 def index():
     session.clear()
@@ -93,7 +102,7 @@ def juego():
         'deportes': {'correctas': 0, 'total': 0},
         'musica': {'correctas': 0, 'total': 0},
         'geografia': {'correctas': 0, 'total': 0},
-        'entretenimiento': {'correctas': 0, 'total': 0}
+        'cine': {'correctas': 0, 'total': 0}
     }
     
     # Tracking de preguntas usadas
@@ -115,9 +124,28 @@ def obtener_pregunta(categoria):
         if categoria not in categorias_validas:
             return jsonify({"error": "Categoría no válida"}), 400
         
-        # Obtener pregunta completa con dificultad y puntos
-        query = f"pregunta_completa({categoria}, Pregunta, Opciones, Respuesta, Dificultad, Puntos)"
+        # Determinar dificultad según puntos del jugador actual
+        num_jugadores = session.get('num_jugadores', 1)
+        turno_actual = session.get('turno_actual', 1)
+        
+        if num_jugadores == 1:
+            puntos_actuales = session.get('jugador1_puntos', 0)
+        else:
+            if turno_actual == 1:
+                puntos_actuales = session.get('jugador1_puntos', 0)
+            else:
+                puntos_actuales = session.get('jugador2_puntos', 0)
+        
+        dificultad_objetivo = determinar_dificultad_actual(puntos_actuales)
+        
+        # Obtener preguntas de la dificultad específica
+        query = f"pregunta_completa_con_dificultad({categoria}, {dificultad_objetivo}, Pregunta, Opciones, Respuesta, Puntos)"
         preguntas = list(prolog.query(query))
+        
+        # Si no hay preguntas de esa dificultad, buscar cualquier pregunta de la categoría
+        if not preguntas:
+            query = f"pregunta_completa({categoria}, Pregunta, Opciones, Respuesta, Dificultad, Puntos)"
+            preguntas = list(prolog.query(query))
         
         if not preguntas:
             return jsonify({"error": "No hay preguntas para esta categoría"}), 404
@@ -136,8 +164,11 @@ def obtener_pregunta(categoria):
         pregunta_str = limpiar_string(seleccion["Pregunta"])
         respuesta_str = limpiar_string(seleccion["Respuesta"])
         opciones_list = convertir_lista_prolog(seleccion["Opciones"])
-        dificultad_str = limpiar_string(seleccion["Dificultad"])
+        dificultad_str = limpiar_string(seleccion.get("Dificultad", dificultad_objetivo))
         puntos = int(seleccion["Puntos"])
+        
+        # ✨ ALEATORIZAR LAS OPCIONES para que la correcta no sea siempre la primera
+        random.shuffle(opciones_list)
         
         # Agregar pregunta a las usadas
         if 'preguntas_usadas' not in session:
@@ -207,12 +238,27 @@ def usar_comodin():
             session[comodin_key] = False
             session.modified = True
             
-            # Obtener nueva pregunta de la misma categoría
+            # Obtener nueva pregunta de la misma categoría y dificultad
             if prolog is None:
                 return jsonify({"error": "Prolog no disponible"}), 500
             
-            query = f"pregunta_completa({categoria}, Pregunta, Opciones, Respuesta, Dificultad, Puntos)"
+            # Determinar dificultad según puntos
+            if num_jugadores == 1:
+                puntos_actuales = session.get('jugador1_puntos', 0)
+            else:
+                if turno_actual == 1:
+                    puntos_actuales = session.get('jugador1_puntos', 0)
+                else:
+                    puntos_actuales = session.get('jugador2_puntos', 0)
+            
+            dificultad_objetivo = determinar_dificultad_actual(puntos_actuales)
+            
+            query = f"pregunta_completa_con_dificultad({categoria}, {dificultad_objetivo}, Pregunta, Opciones, Respuesta, Puntos)"
             preguntas = list(prolog.query(query))
+            
+            if not preguntas:
+                query = f"pregunta_completa({categoria}, Pregunta, Opciones, Respuesta, Dificultad, Puntos)"
+                preguntas = list(prolog.query(query))
             
             if not preguntas:
                 return jsonify({"error": "No hay más preguntas"}), 404
@@ -230,8 +276,11 @@ def usar_comodin():
             pregunta_str = limpiar_string(seleccion["Pregunta"])
             respuesta_str = limpiar_string(seleccion["Respuesta"])
             opciones_list = convertir_lista_prolog(seleccion["Opciones"])
-            dificultad_str = limpiar_string(seleccion["Dificultad"])
+            dificultad_str = limpiar_string(seleccion.get("Dificultad", dificultad_objetivo))
             puntos = int(seleccion["Puntos"])
+            
+            # ✨ ALEATORIZAR LAS OPCIONES
+            random.shuffle(opciones_list)
             
             # Agregar a preguntas usadas
             session['preguntas_usadas'].append(pregunta_str)
@@ -301,8 +350,7 @@ def verificar():
                 'deportes': {'correctas': 0, 'total': 0},
                 'musica': {'correctas': 0, 'total': 0},
                 'geografia': {'correctas': 0, 'total': 0},
-                'entretenimiento': {'correctas': 0, 'total': 0}
-
+                'cine': {'correctas': 0, 'total': 0}
             }
         
         if categoria in session['stats_categorias']:
@@ -468,7 +516,7 @@ def resultado():
         mejor_racha = session.get('jugador1_mejor_racha', 0)
         
         # Guardar en base de datos
-        partida_id = guardar_partida("individual", puntos, 0, 1, duracion,session.get('nombre1','Jugador 1'),"")
+        partida_id = guardar_partida("individual", puntos, 0, 1, duracion, session.get('nombre1','Jugador 1'), "")
         if partida_id:
             guardar_estadisticas(partida_id, stats)
         
@@ -487,6 +535,7 @@ def resultado():
         jugador2_mejor_racha = session.get('jugador2_mejor_racha', 0)
         nombre1 = session.get('nombre1', 'Jugador 1')
         nombre2 = session.get('nombre2', 'Jugador 2')
+        
         # Determinar ganador
         if jugador1_vidas <= 0:
             ganador = 2
@@ -500,7 +549,7 @@ def resultado():
             ganador = 0  # Empate
         
         # Guardar en base de datos
-        partida_id = guardar_partida("multijugador", jugador1_puntos, jugador2_puntos, ganador, duracion,session.get('nombre1','Jugador 1'),session.get('nombre2','Jugador 2'))
+        partida_id = guardar_partida("multijugador", jugador1_puntos, jugador2_puntos, ganador, duracion, nombre1, nombre2)
         if partida_id:
             guardar_estadisticas(partida_id, stats)
         
@@ -513,8 +562,8 @@ def resultado():
                              jugador2_vidas=jugador2_vidas,
                              jugador1_mejor_racha=jugador1_mejor_racha,
                              jugador2_mejor_racha=jugador2_mejor_racha,
-                            nombre1=nombre1,    
-                            nombre2=nombre2,
+                             nombre1=nombre1,    
+                             nombre2=nombre2,
                              stats=stats,
                              duracion=duracion)
 

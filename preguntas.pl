@@ -140,7 +140,7 @@ pregunta(ciencia, 'Que es la fotosintesis?',
          ['Proceso de plantas', 'Proceso de animales', 'Tipo de luz', 'Reaccion quimica'], 
          'Proceso de plantas', media).
 
-         % ===== PREGUNTAS DE MUSICA =====
+% ===== PREGUNTAS DE MUSICA =====
 pregunta(musica, 'Quien es conocido como el Rey del Pop?', 
          ['Michael Jackson','Elvis Presley','Prince','Freddie Mercury'], 
          'Michael Jackson', facil).
@@ -150,7 +150,7 @@ pregunta(musica, 'De que pais es originario el tango?',
          'Argentina', media).
 
 pregunta(musica, 'Que compositor escribio la Quinta Sinfonia?', 
-         ['Mozart','Beethoven','Chopin','Bach'], 
+         ['Beethoven','Mozart','Chopin','Bach'], 
          'Beethoven', dificil).
 
 pregunta(musica, 'Que banda compuso el album Abbey Road?', 
@@ -180,6 +180,7 @@ pregunta(musica, 'Que cantante es apodado La Reina del Tejano?',
 pregunta(musica, 'Que ciudad es cuna del grunge?', 
          ['Seattle','Los Angeles','Nueva York','Chicago'], 
          'Seattle', dificil).
+
 % ===== PREGUNTAS DE GEOGRAFIA =====
 pregunta(geografia, 'Cual es la capital de Australia?', 
          ['Canberra','Sidney','Melbourne','Perth'], 
@@ -220,6 +221,7 @@ pregunta(geografia, 'Cual es la capital de Canada?',
 pregunta(geografia, 'Que desierto es el mas grande del mundo?', 
          ['Sahara','Arabia','Gobi','Kalahari'], 
          'Sahara', dificil).
+
 % ===== PREGUNTAS DE CINE =====
 pregunta(cine, 'En que anio se estreno Toy Story?', 
          ['1995','1993','1997','1999'], 
@@ -233,7 +235,7 @@ pregunta(cine, 'Cual es la serie con el Trono de Hierro?',
          ['Game of Thrones','The Witcher','Vikings','The Crown'], 
          'Game of Thrones', facil).
 
-pregunta(cine , 'Que pelicula gano el Oscar a Mejor Pelicula en 2020?', 
+pregunta(cine, 'Que pelicula gano el Oscar a Mejor Pelicula en 2020?', 
          ['Parasitos','1917','Joker','Once Upon a Time in Hollywood'], 
          'Parasitos', dificil).
 
@@ -260,7 +262,6 @@ pregunta(cine, 'Que famosa serie es de la ciudad de Springfield?',
 pregunta(cine, 'En que pelicula aparece el anillo unico?', 
          ['El Senor de los Anillos','Harry Potter','Narnia','Hobbiton'], 
          'El Senor de los Anillos', dificil).
-
 
 % ===== PREGUNTAS DE ARTE =====
 pregunta(arte, 'Quien pinto la Mona Lisa?', 
@@ -435,3 +436,8 @@ mas_dificil(Pregunta1, Pregunta2) :-
     nivel_dificultad(Dif1, N1),
     nivel_dificultad(Dif2, N2),
     N1 > N2.
+
+% ===== NUEVA REGLA: Obtener pregunta por categoría Y dificultad específica =====
+pregunta_completa_con_dificultad(Categoria, Dificultad, Pregunta, Opciones, Respuesta, Puntos) :-
+    pregunta(Categoria, Pregunta, Opciones, Respuesta, Dificultad),
+    puntos_por_dificultad(Dificultad, Puntos).
