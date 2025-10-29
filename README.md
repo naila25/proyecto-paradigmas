@@ -1,10 +1,7 @@
 
-Estadística de cuales preguntas se pierden más *
-
-
- vaya aumentando la dificultad de la pregunta con forme se vaya ganando ******
- 
  si alguien pierde preguntas de deporte que le sigan saliendo de esas *****
+
+ agregar temporizador para que puedan responder en 20 segundos *****
 
  Agregar tildes,  virgulilla ****
 
@@ -14,13 +11,14 @@ Estadística de cuales preguntas se pierden más *
 
  Corregir el ranking ******
 
- Corregir el undefine que sale en cine, musica y geografia *****
-
  corregir lo que volver a jugar que permita que se vuelva a mostrar la opcion de agregar el nombre del jugador *
-
- corregir lo de la opcion que la correcta no siempre sea la primera si no que varie ******
 
   mostrar cuantos puntos lleva cada jugar cuando esten jugando 2 personas *
 
-  agregar temporizador para que puedan responder en 20 segundos *****
-  
+  Estadística de cuales preguntas se pierden más *
+
+
+
+ ///////////////////////////vaya aumentando la dificultad de la pregunta con forme se vaya ganando//// LISTO 
+  /////////////////////////corregir lo de la opcion que la correcta no siempre sea la primera si no que varie //// LISTO
+  ///////////////////////Corregir el undefine que sale en cine, musica y geografia //// LISTO
