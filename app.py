@@ -45,11 +45,11 @@ def convertir_lista_prolog(lista_prolog):
 
 def determinar_dificultad_actual(puntos):
     """Determina la dificultad según los puntos acumulados"""
-    if puntos < 30:  # 0-29 puntos: fácil
+    if puntos < 30:
         return 'facil'
-    elif puntos < 80:  # 30-79 puntos: media
+    elif puntos < 80:
         return 'media'
-    else:  # 80+ puntos: difícil
+    else:
         return 'dificil'
 
 @app.route('/')
@@ -68,10 +68,8 @@ def juego():
     nombre1 = request.args.get('nombre1', 'Jugador 1')
     nombre2 = request.args.get('nombre2', 'Jugador 2')
     
-    # Guardar nombres en la sesión
     session['nombre1'] = nombre1
     session['nombre2'] = nombre2
-    # Inicializar juego
     session['num_jugadores'] = int(num_jugadores)
     session['turno_actual'] = 1
     session['jugador1_puntos'] = 0
@@ -80,7 +78,6 @@ def juego():
     session['jugador2_vidas'] = 3
     session['juego_terminado'] = False
     
-    # Inicializar comodines (3 comodines)
     session['jugador1_comodin_5050'] = True
     session['jugador2_comodin_5050'] = True
     session['jugador1_comodin_cambiar'] = True
@@ -88,13 +85,14 @@ def juego():
     session['jugador1_comodin_saltar'] = True
     session['jugador2_comodin_saltar'] = True
     
-    # Inicializar rachas
     session['jugador1_racha'] = 0
     session['jugador2_racha'] = 0
     session['jugador1_mejor_racha'] = 0
     session['jugador2_mejor_racha'] = 0
     
-    # Inicializar estadísticas por categoría
+    # ✨ NUEVO: Categoría bloqueada por fallo
+    session['categoria_bloqueada'] = None
+    
     session['stats_categorias'] = {
         'historia': {'correctas': 0, 'total': 0},
         'ciencia': {'correctas': 0, 'total': 0},
@@ -105,10 +103,8 @@ def juego():
         'cine': {'correctas': 0, 'total': 0}
     }
     
-    # Tracking de preguntas usadas
     session['preguntas_usadas'] = []
     
-    # Tiempo de inicio
     import time
     session['tiempo_inicio'] = int(time.time())
 
@@ -120,11 +116,15 @@ def obtener_pregunta(categoria):
         if prolog is None:
             return jsonify({"error": "Prolog no está disponible"}), 500
         
+        # ✨ VERIFICAR SI HAY CATEGORÍA BLOQUEADA
+        categoria_bloqueada = session.get('categoria_bloqueada')
+        if categoria_bloqueada:
+            categoria = categoria_bloqueada
+        
         categorias_validas = ['historia', 'ciencia', 'arte', 'deportes','musica', 'geografia', 'cine']
         if categoria not in categorias_validas:
             return jsonify({"error": "Categoría no válida"}), 400
         
-        # Determinar dificultad según puntos del jugador actual
         num_jugadores = session.get('num_jugadores', 1)
         turno_actual = session.get('turno_actual', 1)
         
@@ -138,11 +138,9 @@ def obtener_pregunta(categoria):
         
         dificultad_objetivo = determinar_dificultad_actual(puntos_actuales)
         
-        # Obtener preguntas de la dificultad específica
         query = f"pregunta_completa_con_dificultad({categoria}, {dificultad_objetivo}, Pregunta, Opciones, Respuesta, Puntos)"
         preguntas = list(prolog.query(query))
         
-        # Si no hay preguntas de esa dificultad, buscar cualquier pregunta de la categoría
         if not preguntas:
             query = f"pregunta_completa({categoria}, Pregunta, Opciones, Respuesta, Dificultad, Puntos)"
             preguntas = list(prolog.query(query))
@@ -150,11 +148,9 @@ def obtener_pregunta(categoria):
         if not preguntas:
             return jsonify({"error": "No hay preguntas para esta categoría"}), 404
         
-        # Filtrar preguntas ya usadas
         preguntas_usadas = session.get('preguntas_usadas', [])
         preguntas_disponibles = [p for p in preguntas if limpiar_string(p["Pregunta"]) not in preguntas_usadas]
         
-        # Si se acabaron las preguntas, reiniciar pool
         if not preguntas_disponibles:
             session['preguntas_usadas'] = []
             preguntas_disponibles = preguntas
@@ -167,10 +163,8 @@ def obtener_pregunta(categoria):
         dificultad_str = limpiar_string(seleccion.get("Dificultad", dificultad_objetivo))
         puntos = int(seleccion["Puntos"])
         
-        # ✨ ALEATORIZAR LAS OPCIONES para que la correcta no sea siempre la primera
         random.shuffle(opciones_list)
         
-        # Agregar pregunta a las usadas
         if 'preguntas_usadas' not in session:
             session['preguntas_usadas'] = []
         session['preguntas_usadas'].append(pregunta_str)
@@ -203,20 +197,17 @@ def usar_comodin():
         num_jugadores = session.get('num_jugadores', 1)
         turno_actual = session.get('turno_actual', 1)
         
-        # Determinar qué jugador está usando el comodín
         if num_jugadores == 1:
             jugador_key = 'jugador1'
         else:
             jugador_key = f'jugador{turno_actual}'
         
-        # COMODÍN 50/50
         if comodin == '5050':
             comodin_key = f'{jugador_key}_comodin_5050'
             if not session.get(comodin_key, False):
                 return jsonify({"error": "Comodín ya usado"}), 400
             session[comodin_key] = False
             
-            # Eliminar 2 opciones incorrectas
             opciones_incorrectas = [op for op in opciones if op != respuesta_correcta]
             opciones_a_eliminar = random.sample(opciones_incorrectas, min(2, len(opciones_incorrectas)))
             opciones_restantes = [op for op in opciones if op not in opciones_a_eliminar]
@@ -230,7 +221,6 @@ def usar_comodin():
                 "opciones_eliminadas": opciones_a_eliminar
             })
         
-        # COMODÍN CAMBIAR PREGUNTA
         elif comodin == 'cambiar':
             comodin_key = f'{jugador_key}_comodin_cambiar'
             if not session.get(comodin_key, False):
@@ -238,11 +228,9 @@ def usar_comodin():
             session[comodin_key] = False
             session.modified = True
             
-            # Obtener nueva pregunta de la misma categoría y dificultad
             if prolog is None:
                 return jsonify({"error": "Prolog no disponible"}), 500
             
-            # Determinar dificultad según puntos
             if num_jugadores == 1:
                 puntos_actuales = session.get('jugador1_puntos', 0)
             else:
@@ -263,7 +251,6 @@ def usar_comodin():
             if not preguntas:
                 return jsonify({"error": "No hay más preguntas"}), 404
             
-            # Filtrar pregunta actual y preguntas usadas
             preguntas_usadas = session.get('preguntas_usadas', [])
             preguntas_disponibles = [p for p in preguntas 
                                     if limpiar_string(p["Pregunta"]) not in preguntas_usadas]
@@ -279,10 +266,8 @@ def usar_comodin():
             dificultad_str = limpiar_string(seleccion.get("Dificultad", dificultad_objetivo))
             puntos = int(seleccion["Puntos"])
             
-            # ✨ ALEATORIZAR LAS OPCIONES
             random.shuffle(opciones_list)
             
-            # Agregar a preguntas usadas
             session['preguntas_usadas'].append(pregunta_str)
             session.modified = True
             
@@ -297,7 +282,6 @@ def usar_comodin():
                 "categoria": categoria
             })
         
-        # COMODÍN SALTAR PREGUNTA
         elif comodin == 'saltar':
             comodin_key = f'{jugador_key}_comodin_saltar'
             if not session.get(comodin_key, False):
@@ -326,6 +310,7 @@ def verificar():
         respuesta = data["respuesta"]
         categoria = data.get("categoria", "")
         puntos_pregunta = data.get("puntos", 10)
+        tiempo_restante = data.get("tiempo_restante", 0)
         
         if prolog is None:
             return jsonify({"error": "Prolog no está disponible"}), 500
@@ -339,9 +324,12 @@ def verificar():
         num_jugadores = session.get('num_jugadores', 1)
         turno_actual = session.get('turno_actual', 1)
         
-        es_correcta = len(resultado) > 0
+        # ✨ SI EL TIEMPO SE ACABÓ, CONSIDERAR COMO INCORRECTA
+        if tiempo_restante <= 0:
+            es_correcta = False
+        else:
+            es_correcta = len(resultado) > 0
         
-        # Actualizar estadísticas por categoría
         if 'stats_categorias' not in session:
             session['stats_categorias'] = {
                 'historia': {'correctas': 0, 'total': 0},
@@ -358,8 +346,13 @@ def verificar():
             if es_correcta:
                 session['stats_categorias'][categoria]['correctas'] += 1
         
+        # ✨ LÓGICA DE CATEGORÍA BLOQUEADA
+        if es_correcta:
+            session['categoria_bloqueada'] = None
+        else:
+            session['categoria_bloqueada'] = categoria
+        
         if num_jugadores == 1:
-            # Modo 1 jugador
             if 'jugador1_puntos' not in session:
                 session['jugador1_puntos'] = 0
             if 'jugador1_racha' not in session:
@@ -373,11 +366,9 @@ def verificar():
                 session['jugador1_puntos'] += puntos_pregunta
                 session['jugador1_racha'] += 1
                 
-                # Actualizar mejor racha
                 if session['jugador1_racha'] > session['jugador1_mejor_racha']:
                     session['jugador1_mejor_racha'] = session['jugador1_racha']
                 
-                # Bonus por racha
                 if session['jugador1_racha'] >= 3:
                     bonus_racha = session['jugador1_racha'] * 5
                     session['jugador1_puntos'] += bonus_racha
@@ -392,11 +383,11 @@ def verificar():
                 "racha": session['jugador1_racha'],
                 "mejor_racha": session['jugador1_mejor_racha'],
                 "bonus_racha": bonus_racha,
-                "modo": "individual"
+                "modo": "individual",
+                "categoria_bloqueada": session.get('categoria_bloqueada')
             })
         
         else:
-            # Modo 2 jugadores
             racha_key = f'jugador{turno_actual}_racha'
             mejor_racha_key = f'jugador{turno_actual}_mejor_racha'
             
@@ -429,7 +420,6 @@ def verificar():
                         bonus_racha = session['jugador2_racha'] * 5
                         session['jugador2_puntos'] += bonus_racha
             else:
-                # Quitar una vida si es incorrecta
                 if turno_actual == 1:
                     session['jugador1_vidas'] -= 1
                     session['jugador1_racha'] = 0
@@ -437,7 +427,6 @@ def verificar():
                     session['jugador2_vidas'] -= 1
                     session['jugador2_racha'] = 0
             
-            # Verificar si alguien perdió todas sus vidas
             jugador1_vidas = session.get('jugador1_vidas', 3)
             jugador2_vidas = session.get('jugador2_vidas', 3)
             
@@ -449,7 +438,6 @@ def verificar():
                 ganador = 1
                 session['juego_terminado'] = True
             
-            # Cambiar turno si la respuesta fue incorrecta o si el juego no terminó
             if not es_correcta and not session.get('juego_terminado', False):
                 session['turno_actual'] = 2 if turno_actual == 1 else 1
             
@@ -467,7 +455,8 @@ def verificar():
                 "jugador2_racha": session.get('jugador2_racha', 0),
                 "bonus_racha": bonus_racha,
                 "juego_terminado": session.get('juego_terminado', False),
-                "ganador": ganador
+                "ganador": ganador,
+                "categoria_bloqueada": session.get('categoria_bloqueada')
             })
             
     except Exception as e:
@@ -478,7 +467,6 @@ def verificar():
 
 @app.route('/estado-juego')
 def estado_juego():
-    """Retorna el estado actual del juego"""
     num_jugadores = session.get('num_jugadores', 1)
     
     response = {
@@ -496,7 +484,8 @@ def estado_juego():
         "jugador1_comodin_saltar": session.get('jugador1_comodin_saltar', True),
         "jugador2_comodin_saltar": session.get('jugador2_comodin_saltar', True) if num_jugadores == 2 else True,
         "jugador1_racha": session.get('jugador1_racha', 0),
-        "jugador2_racha": session.get('jugador2_racha', 0) if num_jugadores == 2 else 0
+        "jugador2_racha": session.get('jugador2_racha', 0) if num_jugadores == 2 else 0,
+        "categoria_bloqueada": session.get('categoria_bloqueada')
     }
     
     return jsonify(response)
@@ -506,7 +495,6 @@ def resultado():
     num_jugadores = session.get('num_jugadores', 1)
     stats = session.get('stats_categorias', {})
     
-    # Calcular duración
     import time
     tiempo_inicio = session.get('tiempo_inicio', int(time.time()))
     duracion = int(time.time()) - tiempo_inicio
@@ -515,7 +503,6 @@ def resultado():
         puntos = session.get('jugador1_puntos', 0)
         mejor_racha = session.get('jugador1_mejor_racha', 0)
         
-        # Guardar en base de datos
         partida_id = guardar_partida("individual", puntos, 0, 1, duracion, session.get('nombre1','Jugador 1'), "")
         if partida_id:
             guardar_estadisticas(partida_id, stats)
@@ -536,7 +523,6 @@ def resultado():
         nombre1 = session.get('nombre1', 'Jugador 1')
         nombre2 = session.get('nombre2', 'Jugador 2')
         
-        # Determinar ganador
         if jugador1_vidas <= 0:
             ganador = 2
         elif jugador2_vidas <= 0:
@@ -546,9 +532,8 @@ def resultado():
         elif jugador2_puntos > jugador1_puntos:
             ganador = 2
         else:
-            ganador = 0  # Empate
+            ganador = 0
         
-        # Guardar en base de datos
         partida_id = guardar_partida("multijugador", jugador1_puntos, jugador2_puntos, ganador, duracion, nombre1, nombre2)
         if partida_id:
             guardar_estadisticas(partida_id, stats)
@@ -569,7 +554,6 @@ def resultado():
 
 @app.route('/ranking')
 def ranking():
-    """Muestra el ranking de mejores puntuaciones"""
     ranking_individual = obtener_ranking('individual', 10)
     ranking_multi = obtener_ranking('multijugador', 10)
     stats_globales = obtener_estadisticas_globales()
