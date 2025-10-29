@@ -10,6 +10,10 @@ const tam = canvas.width / 2;
 let anguloInicio = 0;
 let girando = false;
 
+// ✨ NUEVO: Temporizador
+let temporizadorIntervalo = null;
+let tiempoRestante = 20;
+
 // Estado del juego
 let estadoJuego = {
   numJugadores: NUM_JUGADORES,
@@ -26,7 +30,8 @@ let estadoJuego = {
   jugador2ComodinSaltar: true,
   jugador1Racha: 0,
   jugador2Racha: 0,
-  juegoTerminado: false
+  juegoTerminado: false,
+  categoriaBloqueada: null  // ✨ NUEVO
 };
 
 // Variables para la pregunta actual
@@ -113,8 +118,6 @@ function actualizarInfoJugadores() {
       </div>
       <p class="mt-2 text-yellow-300 text-lg font-bold">
         🎮 Turno de ${estadoJuego.turnoActual === 1 ? estadoJuego.nombre1 : estadoJuego.nombre2}
-
-
       </p>
     `;
   }
@@ -140,12 +143,62 @@ async function cargarEstadoJuego() {
     estadoJuego.jugador1Racha = data.jugador1_racha;
     estadoJuego.jugador2Racha = data.jugador2_racha;
     estadoJuego.juegoTerminado = data.juego_terminado;
+    estadoJuego.categoriaBloqueada = data.categoria_bloqueada;  // ✨ NUEVO
     estadoJuego.nombre1 = NOMBRE1;
     estadoJuego.nombre2 = NOMBRE2;
 
     actualizarInfoJugadores();
   } catch (error) {
     console.error('Error cargando estado:', error);
+  }
+}
+
+// ✨ NUEVO: Función para iniciar temporizador
+function iniciarTemporizador() {
+  tiempoRestante = 20;
+  detenerTemporizador();
+  
+  const temporizadorDiv = document.getElementById('temporizador');
+  if (temporizadorDiv) {
+    temporizadorDiv.classList.remove('hidden');
+  }
+  
+  actualizarTemporizador();
+  
+  temporizadorIntervalo = setInterval(() => {
+    tiempoRestante--;
+    actualizarTemporizador();
+    
+    if (tiempoRestante <= 0) {
+      detenerTemporizador();
+      // Respuesta automática incorrecta por tiempo agotado
+      verificar(preguntaActual.pregunta, '', preguntaActual.respuesta, preguntaActual.categoria, preguntaActual.puntos);
+    }
+  }, 1000);
+}
+
+// ✨ NUEVO: Función para actualizar display del temporizador
+function actualizarTemporizador() {
+  const temporizadorDiv = document.getElementById('temporizador');
+  if (temporizadorDiv) {
+    const colorClase = tiempoRestante <= 5 ? 'text-red-400 animate-pulse' : 'text-yellow-300';
+    temporizadorDiv.innerHTML = `
+      <div class="text-center mb-4">
+        <p class="${colorClase} text-3xl font-bold">⏱️ ${tiempoRestante}s</p>
+      </div>
+    `;
+  }
+}
+
+// ✨ NUEVO: Función para detener temporizador
+function detenerTemporizador() {
+  if (temporizadorIntervalo) {
+    clearInterval(temporizadorIntervalo);
+    temporizadorIntervalo = null;
+  }
+  const temporizadorDiv = document.getElementById('temporizador');
+  if (temporizadorDiv) {
+    temporizadorDiv.classList.add('hidden');
   }
 }
 
@@ -201,17 +254,36 @@ boton.addEventListener("click", () => {
 
   reproducirSonido('girar');
 
-  const vueltasCompletas = Math.floor(Math.random() * 4) + 5;
-  const anguloFinal = Math.random() * 360;
-  const giroTotal = vueltasCompletas * 360 + anguloFinal;
+  // ✨ MODIFICADO: Si hay categoría bloqueada, usar esa (SIN MOSTRAR MENSAJES)
+  let categoriaSeleccionada;
+  let indiceCategoria;
+  
+  if (estadoJuego.categoriaBloqueada) {
+    categoriaSeleccionada = estadoJuego.categoriaBloqueada;
+    indiceCategoria = categorias.indexOf(categoriaSeleccionada);
+    
+    // Calcular ángulo para que caiga en esa categoría
+    const segmentoPorCategoria = 360 / categorias.length;
+    const anguloObjetivo = indiceCategoria * segmentoPorCategoria + segmentoPorCategoria / 2;
+    const vueltasCompletas = Math.floor(Math.random() * 3) + 3;
+    const giroTotal = vueltasCompletas * 360 + anguloObjetivo;
+    
+    canvas.style.transition = "transform 4s cubic-bezier(0.23, 1, 0.32, 1)";
+    canvas.style.transform = `rotate(${giroTotal}deg)`;
+  } else {
+    // Giro normal aleatorio
+    const vueltasCompletas = Math.floor(Math.random() * 4) + 5;
+    const anguloFinal = Math.random() * 360;
+    const giroTotal = vueltasCompletas * 360 + anguloFinal;
 
-  const anguloNormalizado = (360 - (anguloFinal % 360)) % 360;
-  const segmentoPorCategoria = 360 / categorias.length;
-  const indiceCategoria = Math.floor(anguloNormalizado / segmentoPorCategoria);
-  const categoriaSeleccionada = categorias[indiceCategoria];
+    const anguloNormalizado = (360 - (anguloFinal % 360)) % 360;
+    const segmentoPorCategoria = 360 / categorias.length;
+    indiceCategoria = Math.floor(anguloNormalizado / segmentoPorCategoria);
+    categoriaSeleccionada = categorias[indiceCategoria];
 
-  canvas.style.transition = "transform 4s cubic-bezier(0.23, 1, 0.32, 1)";
-  canvas.style.transform = `rotate(${giroTotal}deg)`;
+    canvas.style.transition = "transform 4s cubic-bezier(0.23, 1, 0.32, 1)";
+    canvas.style.transform = `rotate(${giroTotal}deg)`;
+  }
 
   setTimeout(() => {
     girando = false;
@@ -325,12 +397,13 @@ async function cargarPregunta(categoria) {
       comodinHTML += '</div>';
     }
 
-    // - Mostrar la pregunta en pantalla
+    // Mostrar la pregunta en pantalla
     document.getElementById("pregunta").innerHTML = `
       <div class="text-center">
         ${turnoMensaje}
         <p class="mb-2 text-2xl font-semibold">${categoriaEmojis[categoria]} Categoría: <span class="capitalize text-yellow-300">${categoria}</span></p>
         <p class="mb-4 text-lg ${dificultadColores[data.dificultad]}">Dificultad: ${dificultadEmojis[data.dificultad]} ${data.dificultad.toUpperCase()} (${data.puntos} puntos)</p>
+        <div id="temporizador" class="hidden"></div>
         ${comodinHTML}
         <p class="mb-6 text-xl font-medium">${data.pregunta}</p>
         <div id="opciones-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl mx-auto">
@@ -338,6 +411,9 @@ async function cargarPregunta(categoria) {
         </div>
       </div>
     `;
+
+    // ✨ NUEVO: Iniciar temporizador
+    iniciarTemporizador();
 
   } catch (error) {
     console.error('Error cargando pregunta:', error);
@@ -416,6 +492,9 @@ async function usarComodinCambiar() {
   if (!preguntaActual) return;
 
   try {
+    // ✨ Detener temporizador antes de cambiar pregunta
+    detenerTemporizador();
+
     const res = await fetch('/usar-comodin', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -486,7 +565,7 @@ async function usarComodinCambiar() {
 
       let turnoMensaje = '';
       if (estadoJuego.numJugadores === 2) {
-        turnoMensaje = `<p class="mb-2 text-xl font-bold text-yellow-300">🎮 Turno del Jugador ${estadoJuego.turnoActual}</p>`;
+        turnoMensaje = `<p class="mb-2 text-xl font-bold text-yellow-300">🎮 Turno de ${estadoJuego.turnoActual === 1 ? estadoJuego.nombre1 : estadoJuego.nombre2}</p>`;
       }
 
       // Actualizar comodines disponibles
@@ -531,6 +610,7 @@ async function usarComodinCambiar() {
           ${turnoMensaje}
           <p class="mb-2 text-2xl font-semibold">${categoriaEmojis[data.categoria]} Categoría: <span class="capitalize text-yellow-300">${data.categoria}</span></p>
           <p class="mb-4 text-lg ${dificultadColores[data.dificultad]}">Dificultad: ${dificultadEmojis[data.dificultad]} ${data.dificultad.toUpperCase()} (${data.puntos} puntos)</p>
+          <div id="temporizador" class="hidden"></div>
           ${comodinHTML}
           <p class="mb-6 text-xl font-medium">${data.pregunta}</p>
           <div id="opciones-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl mx-auto">
@@ -538,6 +618,9 @@ async function usarComodinCambiar() {
           </div>
         </div>
       `;
+
+      // ✨ Reiniciar temporizador con nueva pregunta
+      iniciarTemporizador();
     }
   } catch (error) {
     console.error('Error usando comodín cambiar:', error);
@@ -549,6 +632,9 @@ async function usarComodinSaltar() {
   if (!preguntaActual) return;
 
   try {
+    // ✨ Detener temporizador
+    detenerTemporizador();
+
     const res = await fetch('/usar-comodin', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -599,6 +685,9 @@ async function usarComodinSaltar() {
 
 async function verificar(pregunta, respuestaSeleccionada, respuestaCorrecta, categoria, puntos) {
   try {
+    // ✨ DETENER TEMPORIZADOR
+    detenerTemporizador();
+
     const res = await fetch('/verificar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -606,7 +695,8 @@ async function verificar(pregunta, respuestaSeleccionada, respuestaCorrecta, cat
         pregunta,
         respuesta: respuestaSeleccionada,
         categoria: categoria,
-        puntos: puntos
+        puntos: puntos,
+        tiempo_restante: tiempoRestante
       })
     });
     const data = await res.json();
@@ -621,12 +711,12 @@ async function verificar(pregunta, respuestaSeleccionada, respuestaCorrecta, cat
       estadoJuego.jugador1Racha = data.jugador1_racha;
       estadoJuego.jugador2Racha = data.jugador2_racha;
       estadoJuego.juegoTerminado = data.juego_terminado;
+      estadoJuego.categoriaBloqueada = data.categoria_bloqueada;
 
       actualizarInfoJugadores();
 
       if (data.juego_terminado) {
         reproducirSonido('correcto');
-        // Juego terminado
         setTimeout(() => {
           window.location.href = '/resultado';
         }, 3000);
@@ -634,7 +724,7 @@ async function verificar(pregunta, respuestaSeleccionada, respuestaCorrecta, cat
         document.getElementById("pregunta").innerHTML = `
           <div class="text-center animate-bounce">
             <h2 class="text-5xl mb-4">🏆 ¡JUEGO TERMINADO!</h2>
-            <p class="text-3xl mb-4">Ganador: Jugador ${data.ganador}</p>
+            <p class="text-3xl mb-4">Ganador: ${data.ganador === 1 ? estadoJuego.nombre1 : estadoJuego.nombre2}</p>
             <p class="text-sm">Redirigiendo...</p>
           </div>
         `;
@@ -643,6 +733,7 @@ async function verificar(pregunta, respuestaSeleccionada, respuestaCorrecta, cat
     } else {
       estadoJuego.jugador1Puntos = data.puntos;
       estadoJuego.jugador1Racha = data.racha;
+      estadoJuego.categoriaBloqueada = data.categoria_bloqueada;
       actualizarInfoJugadores();
     }
 
@@ -665,7 +756,7 @@ async function verificar(pregunta, respuestaSeleccionada, respuestaCorrecta, cat
           bonusRachaMsg = `<p class="text-xl text-yellow-300">+${data.bonus_racha} puntos de bonus por racha!</p>`;
         }
 
-        mensajeTurno = `<p class="text-lg mb-2">Jugador ${jugadorAnterior} continúa...</p>`;
+        mensajeTurno = `<p class="text-lg mb-2">${jugadorAnterior === 1 ? estadoJuego.nombre1 : estadoJuego.nombre2} continúa...</p>`;
       } else {
         if (data.racha >= 3) {
           mensajeRacha = `<p class="text-2xl mb-2 text-orange-400">🔥 ¡RACHA DE ${data.racha}! 🔥</p>`;
@@ -703,16 +794,16 @@ async function verificar(pregunta, respuestaSeleccionada, respuestaCorrecta, cat
           estadoJuego.juegoTerminado = true;
 
           document.getElementById("pregunta").innerHTML = `
-        <div class="text-center animate-bounce">
-          <h2 class="text-5xl mb-4 text-red-400">💀 ¡Juego terminado!</h2>
-          <p class="text-2xl mb-4">Te quedaste sin vidas.</p>
-          <p class="text-lg mb-4">La respuesta correcta era: <span class="text-yellow-300 font-bold">${respuestaCorrecta}</span></p>
-          <p class="text-2xl mb-4 text-green-300 font-semibold">Puntaje final: ${estadoJuego.jugador1Puntos}</p>
-          <button onclick="terminarJuego()" class="bg-red-500 px-6 py-3 rounded-lg hover:bg-red-400 transition font-bold shadow-lg transform hover:scale-105">
-            🏁 Ver resultado
-          </button>
-        </div>
-      `;
+            <div class="text-center animate-bounce">
+              <h2 class="text-5xl mb-4 text-red-400">💀 ¡Juego terminado!</h2>
+              <p class="text-2xl mb-4">Te quedaste sin vidas.</p>
+              <p class="text-lg mb-4">La respuesta correcta era: <span class="text-yellow-300 font-bold">${respuestaCorrecta}</span></p>
+              <p class="text-2xl mb-4 text-green-300 font-semibold">Puntaje final: ${estadoJuego.jugador1Puntos}</p>
+              <button onclick="terminarJuego()" class="bg-red-500 px-6 py-3 rounded-lg hover:bg-red-400 transition font-bold shadow-lg transform hover:scale-105">
+                🏁 Ver resultado
+              </button>
+            </div>
+          `;
 
           setTimeout(() => {
             window.location.href = '/resultado';
@@ -722,29 +813,35 @@ async function verificar(pregunta, respuestaSeleccionada, respuestaCorrecta, cat
         }
       }
 
+      // ✨ NUEVO: Mensaje si el tiempo se agotó
+      let mensajeTiempo = '';
+      if (tiempoRestante <= 0) {
+        mensajeTiempo = '<p class="text-xl mb-2 text-red-400">⏰ ¡Se acabó el tiempo!</p>';
+      }
+
       // 💬 Si todavía tiene vidas, mostrar mensaje normal
       let mensajeTurno = '';
       if (data.modo === "multijugador") {
-        mensajeTurno = `<p class="text-lg mb-2 text-yellow-300">Turno del Jugador ${data.turno_actual}</p>`;
+        mensajeTurno = `<p class="text-lg mb-2 text-yellow-300">Turno de ${data.turno_actual === 1 ? estadoJuego.nombre1 : estadoJuego.nombre2}</p>`;
       }
 
-      actualizarInfoJugadores(); // 🔁 Refresca los corazones o datos
+      actualizarInfoJugadores();
 
       document.getElementById("pregunta").innerHTML = `
-    <div class="text-center">
-      <h2 class="text-4xl mb-4">❌ Incorrecto</h2>
-      ${mensajeTurno}
-      <p class="text-xl mb-2 text-red-300">Tu respuesta: <strong>${respuestaSeleccionada}</strong></p>
-      <p class="text-xl mb-4">La respuesta correcta era: <span class="text-yellow-300 font-bold">${respuestaCorrecta}</span></p>
-      <p class="text-lg mb-4 text-pink-300">💔 Te queda${estadoJuego.jugador1Vidas === 1 ? '' : 'n'} ${estadoJuego.jugador1Vidas} vida${estadoJuego.jugador1Vidas === 1 ? '' : 's'}</p>
-      <div class="flex gap-3 justify-center flex-wrap mt-6">
-        <button onclick="nuevaPregunta()" class="bg-blue-500 px-6 py-3 rounded-lg hover:bg-blue-400 transition font-bold shadow-lg transform hover:scale-105">🎯 Continuar</button>
-        <button onclick="terminarJuego()" class="bg-red-500 px-6 py-3 rounded-lg hover:bg-red-400 transition font-bold shadow-lg transform hover:scale-105">🏁 Terminar juego</button>
-      </div>
-    </div>
-  `;
+        <div class="text-center">
+          <h2 class="text-4xl mb-4">❌ Incorrecto</h2>
+          ${mensajeTiempo}
+          ${mensajeTurno}
+          <p class="text-xl mb-2 text-red-300">Tu respuesta: <strong>${respuestaSeleccionada || '(Sin respuesta)'}</strong></p>
+          <p class="text-xl mb-4">La respuesta correcta era: <span class="text-yellow-300 font-bold">${respuestaCorrecta}</span></p>
+          ${data.modo === "individual" ? `<p class="text-lg mb-4 text-pink-300">💔 Te queda${estadoJuego.jugador1Vidas === 1 ? '' : 'n'} ${estadoJuego.jugador1Vidas} vida${estadoJuego.jugador1Vidas === 1 ? '' : 's'}</p>` : ''}
+          <div class="flex gap-3 justify-center flex-wrap mt-6">
+            <button onclick="nuevaPregunta()" class="bg-blue-500 px-6 py-3 rounded-lg hover:bg-blue-400 transition font-bold shadow-lg transform hover:scale-105">🎯 Continuar</button>
+            <button onclick="terminarJuego()" class="bg-red-500 px-6 py-3 rounded-lg hover:bg-red-400 transition font-bold shadow-lg transform hover:scale-105">🏁 Terminar juego</button>
+          </div>
+        </div>
+      `;
     }
-
 
   } catch (error) {
     console.error('Error verificando respuesta:', error);
@@ -767,8 +864,12 @@ function nuevaPregunta() {
   preguntaActual = null;
   opcionesOriginales = [];
   opcionesEliminadas = [];
+  
+  // ✨ Detener temporizador si está activo
+  detenerTemporizador();
 }
 
 function terminarJuego() {
+  detenerTemporizador();
   window.location.href = '/resultado';
 }
