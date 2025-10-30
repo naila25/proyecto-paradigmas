@@ -2,8 +2,8 @@ const canvas = document.getElementById("ruleta");
 const ctx = canvas.getContext("2d");
 const boton = document.getElementById("botonGirar");
 
-const categorias = ["arte","deportes","historia","ciencia","musica","geografia","cine"];
-const colores    = ["#3B82F6","#EAB308","#EF4444","#22C55E","#a855f7","#06b6d4","#f97316"];
+const categorias = ["arte", "deportes", "historia", "ciencia", "musica", "geografia", "cine"];
+const colores = ["#3B82F6", "#EAB308", "#EF4444", "#22C55E", "#a855f7", "#06b6d4", "#f97316"];
 
 const tam = canvas.width / 2;
 
@@ -121,6 +121,7 @@ function actualizarInfoJugadores() {
       </p>
     `;
   }
+ 
 }
 
 async function cargarEstadoJuego() {
@@ -157,18 +158,18 @@ async function cargarEstadoJuego() {
 function iniciarTemporizador() {
   tiempoRestante = 20;
   detenerTemporizador();
-  
+
   const temporizadorDiv = document.getElementById('temporizador');
   if (temporizadorDiv) {
     temporizadorDiv.classList.remove('hidden');
   }
-  
+
   actualizarTemporizador();
-  
+
   temporizadorIntervalo = setInterval(() => {
     tiempoRestante--;
     actualizarTemporizador();
-    
+
     if (tiempoRestante <= 0) {
       detenerTemporizador();
       // Respuesta automática incorrecta por tiempo agotado
@@ -244,6 +245,9 @@ function reproducirSonido(tipo) {
 dibujarRuleta();
 cargarEstadoJuego();
 
+
+
+
 boton.addEventListener("click", () => {
   if (girando || estadoJuego.juegoTerminado) return;
   girando = true;
@@ -257,17 +261,17 @@ boton.addEventListener("click", () => {
   // ✨ MODIFICADO: Si hay categoría bloqueada, usar esa (SIN MOSTRAR MENSAJES)
   let categoriaSeleccionada;
   let indiceCategoria;
-  
+
   if (estadoJuego.categoriaBloqueada) {
     categoriaSeleccionada = estadoJuego.categoriaBloqueada;
     indiceCategoria = categorias.indexOf(categoriaSeleccionada);
-    
+
     // Calcular ángulo para que caiga en esa categoría
     const segmentoPorCategoria = 360 / categorias.length;
     const anguloObjetivo = indiceCategoria * segmentoPorCategoria + segmentoPorCategoria / 2;
     const vueltasCompletas = Math.floor(Math.random() * 3) + 3;
     const giroTotal = vueltasCompletas * 360 + anguloObjetivo;
-    
+
     canvas.style.transition = "transform 4s cubic-bezier(0.23, 1, 0.32, 1)";
     canvas.style.transform = `rotate(${giroTotal}deg)`;
   } else {
@@ -295,6 +299,12 @@ boton.addEventListener("click", () => {
     cargarPregunta(categoriaSeleccionada);
   }, 4000);
 });
+
+
+
+
+
+
 
 async function cargarPregunta(categoria) {
   try {
@@ -864,7 +874,7 @@ function nuevaPregunta() {
   preguntaActual = null;
   opcionesOriginales = [];
   opcionesEliminadas = [];
-  
+
   // ✨ Detener temporizador si está activo
   detenerTemporizador();
 }
