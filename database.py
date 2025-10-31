@@ -78,11 +78,11 @@ def obtener_ranking(modo='individual', limit=10):
         conn = sqlite3.connect(DB_NAME)
         c = conn.cursor()
         if modo == 'individual':
-            c.execute("""SELECT jugador1_puntos as puntos, fecha 
-                         FROM partidas 
-                         WHERE modo='individual' 
-                         ORDER BY puntos DESC 
-                         LIMIT ?""", (limit,))
+          c.execute("""SELECT jugador1_puntos as puntos, fecha, nombre1 
+             FROM partidas 
+             WHERE modo='individual' 
+             ORDER BY puntos DESC 
+             LIMIT ?""", (limit,))
         else:
             c.execute("""SELECT jugador1_puntos, jugador2_puntos, ganador, fecha , nombre1, nombre2
                          FROM partidas 

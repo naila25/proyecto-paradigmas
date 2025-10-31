@@ -19,64 +19,64 @@ dificultad(dificil).
 
 % ===== PREGUNTAS DE HISTORIA =====
 
-pregunta(historia, 'Quien descubrio America?', 
-         ['Cristobal Colon', 'Americo Vespucio', 'Fernando de Magallanes', 'Hernan Cortes'], 
-         'Cristobal Colon', facil).
+pregunta(historia, '¿Quién descubrió América?', 
+         ['Cristóbal Colón', 'Américo Vespucio', 'Fernando de Magallanes', 'Hernán Cortés'], 
+         'Cristóbal Colón', facil).
 
-pregunta(historia, 'En que ano fue la independencia de Costa Rica?', 
+pregunta(historia, '¿En qué año fue la independencia de Costa Rica?', 
          ['1821', '1810', '1848', '1902'], 
          '1821', facil).
 
-pregunta(historia, 'Quien fue el primer presidente de Estados Unidos?', 
+pregunta(historia, '¿Quién fue el primer presidente de Estados Unidos?', 
          ['George Washington', 'Thomas Jefferson', 'Abraham Lincoln', 'Benjamin Franklin'], 
          'George Washington', facil).
 
-pregunta(historia, 'En que ano termino la Segunda Guerra Mundial?', 
+pregunta(historia, '¿En qué año terminó la Segunda Guerra Mundial?', 
          ['1945', '1944', '1946', '1943'], 
          '1945', facil).
 
-pregunta(historia, 'Que civilizacion construyo Machu Picchu?', 
+pregunta(historia, '¿Qué civilización construyó Machu Picchu?', 
          ['Incas', 'Mayas', 'Aztecas', 'Olmecas'], 
          'Incas', facil).
 
-pregunta(historia, 'En que ano cayo el Muro de Berlin?', 
+pregunta(historia, '¿En qué año cayó el Muro de Berlín?', 
          ['1989', '1987', '1990', '1991'], 
          '1989', media).
 
-pregunta(historia, 'Quien fue Napoleon Bonaparte?', 
-         ['Emperador frances', 'Rey ingles', 'Zar ruso', 'Sultan turco'], 
-         'Emperador frances', facil).
+pregunta(historia, '¿Quién fue Napoleón Bonaparte?', 
+         ['Emperador francés', 'Rey inglés', 'Zar ruso', 'Sultán turco'], 
+         'Emperador francés', facil).
 
-pregunta(historia, 'En que ano inicio la Primera Guerra Mundial?', 
+pregunta(historia, '¿En qué año inició la Primera Guerra Mundial?', 
          ['1914', '1912', '1916', '1918'], 
          '1914', media).
 
-pregunta(historia, 'Que imperio construyo el Coliseo Romano?', 
+pregunta(historia, '¿Qué imperio construyó el Coliseo Romano?', 
          ['Imperio Romano', 'Imperio Griego', 'Imperio Persa', 'Imperio Egipcio'], 
          'Imperio Romano', facil).
 
-pregunta(historia, 'Quien fue Cleopatra?', 
+pregunta(historia, '¿Quién fue Cleopatra?', 
          ['Reina de Egipto', 'Reina de Grecia', 'Emperatriz romana', 'Diosa egipcia'], 
          'Reina de Egipto', media).
 
-pregunta(historia, 'En que ano llego el hombre a la Luna?', 
+pregunta(historia, '¿En qué año llegó el hombre a la Luna?', 
          ['1969', '1965', '1972', '1968'], 
          '1969', media).
 
-pregunta(historia, 'Que tratado puso fin a la Primera Guerra Mundial?', 
-         ['Tratado de Versalles', 'Tratado de Paris', 'Tratado de Viena', 'Tratado de Roma'], 
+pregunta(historia, '¿Qué tratado puso fin a la Primera Guerra Mundial?', 
+         ['Tratado de Versalles', 'Tratado de París', 'Tratado de Viena', 'Tratado de Roma'], 
          'Tratado de Versalles', dificil).
 
-pregunta(historia, 'Quien fue Julio Cesar?', 
-         ['General romano', 'Rey griego', 'Faraon egipcio', 'Emperador chino'], 
+pregunta(historia, '¿Quién fue Julio César?', 
+         ['General romano', 'Rey griego', 'Faraón egipcio', 'Emperador chino'], 
          'General romano', media).
 
-pregunta(historia, 'En que siglo fue el Renacimiento?', 
+pregunta(historia, '¿En qué siglo fue el Renacimiento?', 
          ['Siglo XV-XVI', 'Siglo XII-XIII', 'Siglo XVIII-XIX', 'Siglo X-XI'], 
          'Siglo XV-XVI', dificil).
 
-pregunta(historia, 'Que pais construyo la Gran Muralla?', 
-         ['China', 'Japon', 'Mongolia', 'Corea'], 
+pregunta(historia, '¿Qué país construyó la Gran Muralla?', 
+         ['China', 'Japón', 'Mongolia', 'Corea'], 
          'China', facil).
 
 % ===== PREGUNTAS DE CIENCIA =====
