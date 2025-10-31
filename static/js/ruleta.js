@@ -10,7 +10,7 @@ const tam = canvas.width / 2;
 let anguloInicio = 0;
 let girando = false;
 
-// ✨ NUEVO: Temporizador
+// Temporizador
 let temporizadorIntervalo = null;
 let tiempoRestante = 20;
 
@@ -31,7 +31,7 @@ let estadoJuego = {
   jugador1Racha: 0,
   jugador2Racha: 0,
   juegoTerminado: false,
-  categoriaBloqueada: null  // ✨ NUEVO
+  categoriaBloqueada: null  
 };
 
 // Variables para la pregunta actual
@@ -154,7 +154,7 @@ async function cargarEstadoJuego() {
   }
 }
 
-// ✨ NUEVO: Función para iniciar temporizador
+//  Función para iniciar temporizador
 function iniciarTemporizador() {
   tiempoRestante = 20;
   detenerTemporizador();
@@ -178,7 +178,7 @@ function iniciarTemporizador() {
   }, 1000);
 }
 
-// ✨ NUEVO: Función para actualizar display del temporizador
+//  Función para actualizar display del temporizador
 function actualizarTemporizador() {
   const temporizadorDiv = document.getElementById('temporizador');
   if (temporizadorDiv) {
@@ -191,7 +191,7 @@ function actualizarTemporizador() {
   }
 }
 
-// ✨ NUEVO: Función para detener temporizador
+// Función para detener temporizador
 function detenerTemporizador() {
   if (temporizadorIntervalo) {
     clearInterval(temporizadorIntervalo);
@@ -258,7 +258,7 @@ boton.addEventListener("click", () => {
 
   reproducirSonido('girar');
 
-  // ✨ MODIFICADO: Si hay categoría bloqueada, usar esa (SIN MOSTRAR MENSAJES)
+  //  Si hay categoría bloqueada, usar esa (SIN MOSTRAR MENSAJES)
   let categoriaSeleccionada;
   let indiceCategoria;
 
@@ -422,7 +422,7 @@ async function cargarPregunta(categoria) {
       </div>
     `;
 
-    // ✨ NUEVO: Iniciar temporizador
+    //  Iniciar temporizador
     iniciarTemporizador();
 
   } catch (error) {
@@ -502,7 +502,7 @@ async function usarComodinCambiar() {
   if (!preguntaActual) return;
 
   try {
-    // ✨ Detener temporizador antes de cambiar pregunta
+    //  Detener temporizador antes de cambiar pregunta
     detenerTemporizador();
 
     const res = await fetch('/usar-comodin', {
@@ -629,7 +629,7 @@ async function usarComodinCambiar() {
         </div>
       `;
 
-      // ✨ Reiniciar temporizador con nueva pregunta
+      // Reiniciar temporizador con nueva pregunta
       iniciarTemporizador();
     }
   } catch (error) {
@@ -642,7 +642,7 @@ async function usarComodinSaltar() {
   if (!preguntaActual) return;
 
   try {
-    // ✨ Detener temporizador
+    // Detener temporizador
     detenerTemporizador();
 
     const res = await fetch('/usar-comodin', {
@@ -695,7 +695,7 @@ async function usarComodinSaltar() {
 
 async function verificar(pregunta, respuestaSeleccionada, respuestaCorrecta, categoria, puntos) {
   try {
-    // ✨ DETENER TEMPORIZADOR
+    // DETENER TEMPORIZADOR
     detenerTemporizador();
 
     const res = await fetch('/verificar', {
@@ -766,8 +766,8 @@ async function verificar(pregunta, respuestaSeleccionada, respuestaCorrecta, cat
           bonusRachaMsg = `<p class="text-xl text-yellow-300">+${data.bonus_racha} puntos de bonus por racha!</p>`;
         }
 
-        mensajeTurno = `<p class="text-lg mb-2">${jugadorAnterior === 1 ? estadoJuego.nombre1 : estadoJuego.nombre2} continúa...</p>`;
-      } else {
+         //////////////////////
+        mensajeTurno = `<p class="text-lg mb-2 text-yellow-300">Turno de ${data.turno_actual === 1 ? estadoJuego.nombre1 : estadoJuego.nombre2}</p>`;
         if (data.racha >= 3) {
           mensajeRacha = `<p class="text-2xl mb-2 text-orange-400">🔥 ¡RACHA DE ${data.racha}! 🔥</p>`;
         }
@@ -795,7 +795,7 @@ async function verificar(pregunta, respuestaSeleccionada, respuestaCorrecta, cat
     } else {
       reproducirSonido('incorrecto');
 
-      // ⚠️ Si es modo 1 jugador, restamos una vida
+      //  Si es modo 1 jugador, restamos una vida
       if (data.modo === "individual") {
         estadoJuego.jugador1Vidas -= 1;
 
@@ -823,7 +823,7 @@ async function verificar(pregunta, respuestaSeleccionada, respuestaCorrecta, cat
         }
       }
 
-      // ✨ NUEVO: Mensaje si el tiempo se agotó
+      //  Mensaje si el tiempo se agotó
       let mensajeTiempo = '';
       if (tiempoRestante <= 0) {
         mensajeTiempo = '<p class="text-xl mb-2 text-red-400">⏰ ¡Se acabó el tiempo!</p>';
@@ -875,7 +875,7 @@ function nuevaPregunta() {
   opcionesOriginales = [];
   opcionesEliminadas = [];
 
-  // ✨ Detener temporizador si está activo
+  // Detener temporizador si está activo
   detenerTemporizador();
 }
 
