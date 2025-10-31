@@ -20,7 +20,7 @@ def init_db():
                   jugador2_puntos INTEGER,
                   ganador INTEGER,
                   duracion INTEGER)''')
-       # 🟢 NUEVO BLOQUE - agrega columnas nombre1 y nombre2 si no existen
+    # - agrega columnas nombre1 y nombre2 si no existen
     try:
         c.execute("ALTER TABLE partidas ADD COLUMN nombre1 TEXT;")
     except:

@@ -90,7 +90,7 @@ def juego():
     session['jugador1_mejor_racha'] = 0
     session['jugador2_mejor_racha'] = 0
     
-    # ✨ NUEVO: Categoría bloqueada por fallo
+    # Categoría bloqueada por fallo
     session['categoria_bloqueada'] = None
     
     session['stats_categorias'] = {
@@ -116,7 +116,7 @@ def obtener_pregunta(categoria):
         if prolog is None:
             return jsonify({"error": "Prolog no está disponible"}), 500
         
-        # ✨ VERIFICAR SI HAY CATEGORÍA BLOQUEADA
+        #  VERIFICAR SI HAY CATEGORÍA BLOQUEADA
         categoria_bloqueada = session.get('categoria_bloqueada')
         if categoria_bloqueada:
             categoria = categoria_bloqueada
@@ -324,7 +324,7 @@ def verificar():
         num_jugadores = session.get('num_jugadores', 1)
         turno_actual = session.get('turno_actual', 1)
         
-        # ✨ SI EL TIEMPO SE ACABÓ, CONSIDERAR COMO INCORRECTA
+        # SI EL TIEMPO SE ACABÓ, CONSIDERAR COMO INCORRECTA
         if tiempo_restante <= 0:
             es_correcta = False
         else:
@@ -346,7 +346,7 @@ def verificar():
             if es_correcta:
                 session['stats_categorias'][categoria]['correctas'] += 1
         
-        # ✨ LÓGICA DE CATEGORÍA BLOQUEADA
+        # LÓGICA DE CATEGORÍA BLOQUEADA
         if es_correcta:
             session['categoria_bloqueada'] = None
         else:
