@@ -15,6 +15,10 @@ dificultad(facil).
 dificultad(media).
 dificultad(dificil).
 
+
+% ===== BASE DE CONOCIMIENTO: HECHOS =====
+
+
 % Formato: pregunta(Categoria, Pregunta, Opciones, Respuesta, Dificultad)
 
 % ===== PREGUNTAS DE HISTORIA =====
@@ -385,51 +389,61 @@ pregunta(deportes, 'Que pais tiene mas Copas del Mundo de futbol?',
          ['Brasil', 'Alemania', 'Argentina', 'Italia'], 
          'Brasil', media).
 
-% ===== REGLAS LOGICAS AVANZADAS =====
+% ===== REGLAS LOGICAS  =====
 
 % Regla 1: Obtener puntos según dificultad
+
 puntos_por_dificultad(facil, 10).
 puntos_por_dificultad(media, 20).
 puntos_por_dificultad(dificil, 30).
 
 % Regla 2: Verificar si una pregunta pertenece a una categoría
+
 pregunta_de_categoria(Pregunta, Categoria) :-
     pregunta(Categoria, Pregunta, _, _, _).
 
 % Regla 3: Contar preguntas por categoría
+
 contar_preguntas(Categoria, Cantidad) :-
     findall(P, pregunta(Categoria, P, _, _, _), Lista),
     length(Lista, Cantidad).
 
 % Regla 4: Obtener todas las preguntas de una dificultad específica
+
 preguntas_por_dificultad(Dificultad, Lista) :-
     findall([Cat, Preg], pregunta(Cat, Preg, _, _, Dificultad), Lista).
 
-% Regla 5: Verificar respuesta correcta (mejorada)
+% Regla 5: Verificar respuesta correcta 
+
 respuesta_correcta(Pregunta, RespuestaUsuario) :-
     pregunta(_, Pregunta, _, RespuestaCorrecta, _),
     RespuestaUsuario = RespuestaCorrecta.
 
 % Regla 6: Obtener dificultad de una pregunta
+
 obtener_dificultad(Pregunta, Dificultad) :-
     pregunta(_, Pregunta, _, _, Dificultad).
 
 % Regla 7: Verificar si una categoría tiene suficientes preguntas
+
 categoria_completa(Categoria) :-
     contar_preguntas(Categoria, Cantidad),
     Cantidad >= 10.
 
 % Regla 8: Obtener pregunta con su dificultad y puntos
+
 pregunta_completa(Categoria, Pregunta, Opciones, Respuesta, Dificultad, Puntos) :-
     pregunta(Categoria, Pregunta, Opciones, Respuesta, Dificultad),
     puntos_por_dificultad(Dificultad, Puntos).
 
 % Regla 9: Clasificar dificultad como numérica
+
 nivel_dificultad(facil, 1).
 nivel_dificultad(media, 2).
 nivel_dificultad(dificil, 3).
 
 % Regla 10: Comparar dificultad de dos preguntas
+
 mas_dificil(Pregunta1, Pregunta2) :-
     obtener_dificultad(Pregunta1, Dif1),
     obtener_dificultad(Pregunta2, Dif2),
@@ -437,7 +451,8 @@ mas_dificil(Pregunta1, Pregunta2) :-
     nivel_dificultad(Dif2, N2),
     N1 > N2.
 
-% ===== NUEVA REGLA: Obtener pregunta por categoría Y dificultad específica =====
+%  Obtener pregunta por categoría Y dificultad específica =====
+
 pregunta_completa_con_dificultad(Categoria, Dificultad, Pregunta, Opciones, Respuesta, Puntos) :-
     pregunta(Categoria, Pregunta, Opciones, Respuesta, Dificultad),
     puntos_por_dificultad(Dificultad, Puntos).
