@@ -258,7 +258,7 @@ boton.addEventListener("click", () => {
 
   reproducirSonido('girar');
 
-  //  Si hay categoría bloqueada, usar esa (SIN MOSTRAR MENSAJES)
+ 
   let categoriaSeleccionada;
   let indiceCategoria;
 
